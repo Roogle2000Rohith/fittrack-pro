@@ -1,7 +1,7 @@
 {
   "name": "FitTrack Pro — Video Coach",
   "short_name": "FitTrack",
-  "description": "Mobile-first Push/Pull/Legs workout tracker, exercise form, video coach and progress history",
+  "description": "Mobile-first PPL fitness tracker with muscle anatomy, exercise guides, video references, and workout progress",
   "id": "./",
   "start_url": "./",
   "scope": "./",
