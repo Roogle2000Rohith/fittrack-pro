@@ -1,14 +1,24 @@
-# FitTrack Pro — Video Coach
+# FitTrack Pro — Exercise Visuals & Video Coach
 
-A browser-based personal workout tracker for Push A / Pull A / Legs + Shoulders A, Push B / Pull B / Legs + Shoulders B. Includes an exercise technique guide, video references, dynamic warm-up/cooldown information, set tracking (weight/reps/RIR), rest timer, progressive overload, and export/import backups.
+A mobile-friendly, personal Push/Pull/Legs workout tracker. Includes all six PPL sessions, 34 technique guides, warm-up/cooldown and mobility links, reps/weight/RIR logging, drop sets, rest timer, and local workout history.
 
-## Website
-After enabling **Settings → Pages → Deploy from a branch → main / (root)**, the app is served at:
+## Live site
+After you enable GitHub Pages for `main` and `/(root)` in repository Settings → Pages:
 
 https://roogle2000rohith.github.io/fittrack-pro/
 
-## Storage
-Your workouts are stored locally in the browser via IndexedDB, with localStorage fallback. The GitHub repository only serves static website files; workout data is not published to GitHub. Keep JSON backups; clearing site data may erase workout history. Exercise diagrams and the UI are available offline after loading the site and installing/caching it; YouTube and other external videos need internet and publisher permission for embedding.
+## Exercise visuals and licensing
 
-## App format
-The source is a self-contained `index.html` (script, styles and movement illustrations embedded), plus an optional service worker, web app manifest and app icon. No backend is required. If you want to split this into multiple source files later, use the downloadable original project ZIP from ChatGPT.
+- **RepDB free tier**: `https://github.com/RepDB/exercise-dataset` — 34 visual matches to this routine's movements. Reference start/finish WebP images load remotely from the original repository and are **illustrations**, not actual exercise footage. All matches are not exact: incline bench, cable attachment, and machine differences are identified in exercise detail screens. Attribution: [Exercise data by RepDB (repdb.co)](https://repdb.co/). The free-tier license allows in-app use with attribution, but not redistributing the exercise dataset as a standalone dataset or claiming rights to premium animations.
+- **wger**: [wger public REST API](https://wger.de/api/v2/) — public exercise info, no sign-in required for public records; per-exercise content and media licenses apply. Linked for reference, not scraped and republished.
+- **hasaneyldrm/exercises-dataset**: [GIF exercise reference](https://github.com/hasaneyldrm/exercises-dataset). Its code/data can be MIT-licensed but the included Gym visual GIFs have distinct reuse restrictions. FitTrack links to the repo; it does **not** copy or rehost those GIFs.
+- **Video Coach**: Links to provider-hosted videos. Playback requires internet and publisher permission for embedding. User can save their own personal technique URLs.
+
+## Data privacy
+Exercise/session history is saved on your device in browser IndexedDB, with localStorage fallback. Your personal records are **not** committed to GitHub. Use Settings → Export JSON regularly and import after changing browsers/phones. Browser cleaning can erase local data.
+
+## Offline behavior
+The tracker, text instructions, and already-loaded app shell can work offline. Remote exercise illustrations and embedded/linked videos require connectivity; an offline fallback label is shown for missing images.
+
+## Deployment
+Upload `index.html`, `sw.js`, `manifest.webmanifest`, and `icons/icon.svg` to a public GitHub repository, then enable **Settings → Pages → Deploy from a branch → main / (root)**. No backend is needed.
