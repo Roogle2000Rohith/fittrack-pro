@@ -1,0 +1,19 @@
+{
+  "name": "FitTrack Pro — Video Coach",
+  "short_name": "FitTrack",
+  "description": "Personal 6-day PPL tracker with technique guides and workout videos",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b1012",
+  "theme_color": "#0b1012",
+  "icons": [
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
