@@ -878,7 +878,7 @@ function videoGuide(id){
  const custom=safeExerciseVideo((state.videoLinks||{})[id]);const suggestion=chosenVideo(id);
  const selected=custom?{title:'Your saved technique video',provider:'Personal reference',url:custom}:suggestion;
  const card=selected?videoPreviewCard(selected,id,{search:exerciseVideoSearch(ex)}):'<div class="match-warning"><strong>Exact video not selected yet.</strong><p>Use the targeted search below to find a movement with matching equipment and setup.</p></div>';
- const ref=null;const extra=ref?`<p class="video-source"><a href="${esc(ref.url)}" target="_blank" rel="noopener noreferrer">Related Wikimedia reference ↗</a> · ${esc(ref.note)}</p>`:'';
+ const ref=VERIFIED_PUBLIC_VIDEO_LINKS[id];const extra=ref?`<p class="video-source"><a href="${esc(ref.url)}" target="_blank" rel="noopener noreferrer">▶ Source-checked Wikimedia demonstration ↗</a> · ${esc(ref.publisher)} · ${esc(ref.license)}. ${esc(ref.description)} <span class="muted">Link availability can change.</span></p>`:'';
  return `<section class="panel guide-video video-coach-guide"><div class="guide-section-title"><span class="guide-marker">▶</span><h3>Exercise technique videos</h3></div><p class="video-source">Watch the original video for best reliability. Embedded playback depends on the publisher and your browser.</p>${card}${extra}${sourceVideoLinks(ex.name+' '+ex.group+' exercise proper form')}<label for="customVideoUrl" class="video-label">My preferred exercise video or reference</label><div class="video-input-row"><input id="customVideoUrl" type="url" placeholder="Paste any HTTPS video link" value="${esc(custom)}" aria-label="Your technique video"/><button class="btn secondary small" data-action="save-video-link">Save</button>${custom?'<button class="btn ghost small" data-action="clear-video-link">Remove</button>':''}</div><p class="video-source">Saved only in this browser. Videos remain on their original websites.</p></section>`;
 }
 // Exercise video layer. Only links are stored; media is never copied or cached.
@@ -1011,10 +1011,20 @@ function anatomyCard(ex){
  const primary=guide?.primary||ex.group||'Muscle group',secondary=guide?.secondary&&guide.secondary!=='—'?guide.secondary:'None specifically highlighted';
  return '<section class="panel anatomy-card"><div class="anatomy-head"><div><span class="mini-label">MOVEMENT ANATOMY</span><h2>Muscles worked</h2><p>What the movement mainly trains, and what assists.</p></div><span class="anatomy-info-badge">FRONT + BACK</span></div><div class="anatomy-layout"><div class="anatomy-body-pair"><figure><div class="anatomy-silhouette">'+anatomyDiagram('front',main,support)+'</div><figcaption>FRONT</figcaption></figure><figure><div class="anatomy-silhouette">'+anatomyDiagram('back',main,support)+'</div><figcaption>BACK</figcaption></figure></div><div class="anatomy-data"><div class="anatomy-target"><span class="muscle-dot primary"></span><div><span class="anatomy-label">PRIMARY TARGET</span><strong>'+esc(primary)+'</strong></div></div><div class="anatomy-target"><span class="muscle-dot supporting"></span><div><span class="anatomy-label">SUPPORTING / STABILIZING</span><strong>'+esc(secondary)+'</strong></div></div><p class="anatomy-disclaimer">Highlighted areas are approximate training regions, not measurements of muscle activation. Grip, equipment, and technique may shift emphasis.</p></div></div></section>';
 }
+const VERIFIED_PUBLIC_VIDEO_LINKS={
+ 'ez-bar-biceps-curl':{
+ title:'EZ-bar curl compared with straight-bar curl',
+ url:'https://commons.wikimedia.org/wiki/File:Video_of_EZ_Bar_Curl_and_Straight_Bar_Curl.webm',
+ publisher:'Colossus Fitness via Wikimedia Commons',
+ license:'CC BY 3.0',
+ description:'Demonstrates and compares EZ-bar and straight-bar curls. Confirm hand position and controlled technique.'
+ }
+};
 function demoDestination(ex){
  const id=String(ex?.id||ex?.exerciseId||'');
  const custom=safeExerciseVideo((state.videoLinks||{})[id]);
- return custom?{url:custom,label:'My video',curated:true}:{url:exerciseVideoSearch(ex),label:'Find video',curated:false};
+ const reviewed=VERIFIED_PUBLIC_VIDEO_LINKS[id];
+ return custom?{url:custom,label:'My video',curated:true}:reviewed?{url:reviewed.url,label:'Source video',curated:true}:{url:exerciseVideoSearch(ex),label:'Find video',curated:false};
 }
 function exerciseQuickActions(ex,compact=false){
  const id=String(ex?.id||ex?.exerciseId||''),dest=demoDestination(ex);
