@@ -1,13 +1,13 @@
 {
   "name": "FitTrack Pro — Video Coach",
   "short_name": "FitTrack",
-  "description": "Personal 6-day PPL tracker with technique guides and workout videos",
+  "description": "Mobile-first Push/Pull/Legs workout tracker, exercise form, video coach and progress history",
   "id": "./",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#0b1012",
-  "theme_color": "#0b1012",
+  "background_color": "#0c0b16",
+  "theme_color": "#0c0b16",
   "icons": [
     {
       "src": "./icons/icon.svg",
