@@ -339,6 +339,20 @@ input::placeholder,textarea::placeholder{color:#aaa0bc}
 @media(max-width:360px){.bottom-nav button small{font-size:8px}.bottom-nav button span{font-size:19px}.bottom-nav{padding-left:2px;padding-right:2px}}
 @media(prefers-reduced-motion:reduce){.btn:hover{transform:none}}
 </style>
+<style id="fittrack-real-videos-v15">
+.featured-exercise-video{margin:14px 0 17px;padding:15px;background:linear-gradient(120deg,#26213c,#1b172a);border:1px solid #5f4b79;border-radius:15px}
+.verified-video-chip{display:inline-flex;font-size:10px;letter-spacing:.07em;font-weight:800;padding:6px 10px;border-radius:18px;color:#9de4d0;background:#25463e}
+.verified-video-chip.is-related{color:#f6d7a9;background:#594129}
+.verified-video-head h3{font-size:17px;line-height:1.35;margin:9px 0 4px;color:#f7edff}.verified-video-head p{color:#cfc1df;font-size:12px;line-height:1.6;margin:5px 0 13px}
+.featured-video-actions{display:flex;gap:10px;flex-wrap:wrap;margin:13px 0 9px}.featured-video-actions .btn{min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+.verified-demo-video{display:block;max-width:100%;width:100%;aspect-ratio:16/9;max-height:360px;object-fit:contain;border-radius:12px;border:1px solid #423653;background:#090714}
+.video-load-control,.video-guide-source{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px;width:100%;padding:24px;min-height:160px;border:1px solid #6d548d;border-radius:12px;background:radial-gradient(circle at center,#593b7e52,transparent 75%),#211a36;color:#f3e8ff;cursor:pointer}
+.video-load-control strong,.video-guide-source strong{font-size:15px}.video-load-control>span:last-child,.video-guide-source p{font-size:12px;line-height:1.55;color:#cdbbdc}
+.video-guide-source{cursor:default}
+.video-load-play{font-size:23px;color:#f1d9ff;background:#55347c;border-radius:100%;width:50px;height:50px;display:grid;place-items:center}
+.video-source-credit,.video-help{color:#bcb0ce;font-size:11px;line-height:1.6;margin:9px 0}.video-unreviewed-notice{border:1px dashed #7c648e;border-radius:12px;padding:17px;background:#2b2138}.video-unreviewed-notice strong{font-size:15px;color:#f0e5ff}.video-unreviewed-notice p{color:#c5b5d7;font-size:12px;line-height:1.6;margin:7px 0 0}
+@media(max-width:650px){.featured-exercise-video{padding:11px}.featured-video-actions .btn{width:100%;flex:1}.verified-demo-video{max-height:260px}.video-guide-source{min-height:130px}}
+</style>
 </head>
 <body>
   <div class="app-layout">
@@ -873,15 +887,39 @@ const REFERENCE_VIDEOS = {
   'seated-shoulder-press-machine': {title:'Related shoulder press movement',url:'https://commons.wikimedia.org/wiki/File:Shoulder_press_-_exercise_demonstration_video.webm',author:'FitnessScape',license:'CC BY 3.0',note:'This is a general shoulder press demonstration, not your exact machine.'},
   '45-leg-press': {title:'Leg press technique video',url:'https://commons.wikimedia.org/wiki/File:How_to_properly_leg_press.webm',author:'Colossus Fitness',license:'CC BY 3.0 (license review pending on Commons)',note:'Long-form leg press tutorial; use the correct setup for your machine.'}
 };
+function verifiedVideoCard(ref,id){
+ if(!ref)return '';
+ const isRelated=ref.match==='related';
+ const label=isRelated?'RELATED VARIATION — CHECK EQUIPMENT':'SOURCE-REVIEWED EXERCISE';
+ const note=ref.note||'Use your machine instructions and the technique cues below.';
+ const playing=ui.activeVideo==='reviewed-'+id;
+ let content='';
+ if(ref.kind==='commons'&&ref.video){
+   content='<video class="verified-demo-video" controls playsinline preload="none" src="'+esc(ref.video)+'" aria-label="'+esc(ref.title)+'"></video><p class="video-help">Tap the video play control. If it fails to load, use the source link below.</p>';
+ }else if(ref.kind==='youtube'){
+   const url=embedUrl(ref.url);
+   content=playing&&url?'<div class="video-embed"><iframe title="'+esc(ref.title)+'" src="'+esc(url)+'" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>':'<button class="video-load-control" data-action="play-reviewed-video" data-id="'+esc(id)+'"><span class="video-load-play">▶</span><strong>Play demo in FitTrack</strong><span>Opens the publisher-hosted player</span></button>';
+ }else{
+   content='<div class="video-guide-source"><span class="video-load-play">▶</span><strong>Video demonstration on the source website</strong><p>Tap “Watch exercise video” below to view the provider-hosted video and form instructions.</p></div>';
+ }
+ return '<section class="featured-exercise-video" id="featuredExerciseVideo"><div class="verified-video-head"><span class="verified-video-chip '+(isRelated?'is-related':'')+'">'+esc(label)+'</span><h3>'+esc(ref.title)+'</h3><p>'+esc(note)+'</p></div>'+content+
+ '<div class="featured-video-actions"><a class="btn" href="'+esc(ref.url)+'" target="_blank" rel="noopener noreferrer">▶ Watch exercise video ↗</a>'+
+ (ref.kind==='youtube'&&playing?'<button class="btn secondary" data-action="play-reviewed-video" data-id="'+esc(id)+'">Close player</button>':'')+
+ '</div><p class="video-source-credit">Source: '+esc(ref.provider)+' · '+(ref.license?esc(ref.license)+' · ':'')+'Externally hosted. Availability can change.</p></section>';
+}
 function videoGuide(id){
  const ex=allExercises().find(e=>e.id===id)||state.draft?.exercises.find(e=>e.exerciseId===id);if(!ex)return '';
- const custom=safeExerciseVideo((state.videoLinks||{})[id]);const suggestion=chosenVideo(id);
- const selected=custom?{title:'Your saved technique video',provider:'Personal reference',url:custom}:suggestion;
- const card=selected?videoPreviewCard(selected,id,{search:exerciseVideoSearch(ex)}):'<div class="match-warning"><strong>Exact video not selected yet.</strong><p>Use the targeted search below to find a movement with matching equipment and setup.</p></div>';
- const ref=VERIFIED_PUBLIC_VIDEO_LINKS[id];const extra=ref?`<p class="video-source"><a href="${esc(ref.url)}" target="_blank" rel="noopener noreferrer">▶ Source-checked Wikimedia demonstration ↗</a> · ${esc(ref.publisher)} · ${esc(ref.license)}. ${esc(ref.description)} <span class="muted">Link availability can change.</span></p>`:'';
- return `<section class="panel guide-video video-coach-guide"><div class="guide-section-title"><span class="guide-marker">▶</span><h3>Exercise technique videos</h3></div><p class="video-source">Watch the original video for best reliability. Embedded playback depends on the publisher and your browser.</p>${card}${extra}${sourceVideoLinks(ex.name+' '+ex.group+' exercise proper form')}<label for="customVideoUrl" class="video-label">My preferred exercise video or reference</label><div class="video-input-row"><input id="customVideoUrl" type="url" placeholder="Paste any HTTPS video link" value="${esc(custom)}" aria-label="Your technique video"/><button class="btn secondary small" data-action="save-video-link">Save</button>${custom?'<button class="btn ghost small" data-action="clear-video-link">Remove</button>':''}</div><p class="video-source">Saved only in this browser. Videos remain on their original websites.</p></section>`;
+ const custom=safeExerciseVideo((state.videoLinks||{})[id]);
+ const curated=VERIFIED_PUBLIC_VIDEO_LINKS[id];
+ const curatedHtml=curated?verifiedVideoCard(curated,id):'<div class="video-unreviewed-notice"><strong>Direct exercise video not reviewed yet.</strong><p>We are not attaching a random or mismatched video. Use the exact-exercise searches below or save your preferred source.</p></div>';
+ const personal=custom?videoPreviewCard({title:'Your saved exercise video',detail:'Personal video link. Check that it matches your exact exercise.'},id,{query:ex.name+' exercise demo'}):'';
+ return '<section class="panel guide-video video-coach-guide"><div class="guide-section-title"><span class="guide-marker">▶</span><h3>Exercise video demonstrations</h3></div>'+
+ curatedHtml+personal+sourceVideoLinks(ex.name+' '+ex.group+' exercise proper form')+
+ '<label for="customVideoUrl" class="video-label">My preferred video (YouTube, Wikimedia, Vimeo or other HTTPS publisher)</label>'+
+ '<div class="video-input-row"><input id="customVideoUrl" type="url" value="'+esc(custom)+'" placeholder="Paste a video URL" aria-label="Your technique video" /><button class="btn secondary small" data-action="save-video-link">Save</button>'+(custom?'<button class="btn ghost small" data-action="clear-video-link">Remove</button>':'')+'</div>'+
+ '<p class="video-source">Source-hosted videos need internet. If a source disappears, choose another demonstration.</p></section>';
 }
-// Exercise video layer. Only links are stored; media is never copied or cached.
+
 const FEATURED_MEDIA={
  warmup:{
  push:[{title:'Dynamic upper-body warm-up',detail:'Easy shoulder and upper-back movement before pressing.',query:'E3 Rehab dynamic upper body warm up'},{title:'Progressive warm-up sets before pressing',detail:'Ramp up the load gradually before challenging sets.',query:'Renaissance Periodization bench press warmup sets'}],
@@ -1011,20 +1049,12 @@ function anatomyCard(ex){
  const primary=guide?.primary||ex.group||'Muscle group',secondary=guide?.secondary&&guide.secondary!=='—'?guide.secondary:'None specifically highlighted';
  return '<section class="panel anatomy-card"><div class="anatomy-head"><div><span class="mini-label">MOVEMENT ANATOMY</span><h2>Muscles worked</h2><p>What the movement mainly trains, and what assists.</p></div><span class="anatomy-info-badge">FRONT + BACK</span></div><div class="anatomy-layout"><div class="anatomy-body-pair"><figure><div class="anatomy-silhouette">'+anatomyDiagram('front',main,support)+'</div><figcaption>FRONT</figcaption></figure><figure><div class="anatomy-silhouette">'+anatomyDiagram('back',main,support)+'</div><figcaption>BACK</figcaption></figure></div><div class="anatomy-data"><div class="anatomy-target"><span class="muscle-dot primary"></span><div><span class="anatomy-label">PRIMARY TARGET</span><strong>'+esc(primary)+'</strong></div></div><div class="anatomy-target"><span class="muscle-dot supporting"></span><div><span class="anatomy-label">SUPPORTING / STABILIZING</span><strong>'+esc(secondary)+'</strong></div></div><p class="anatomy-disclaimer">Highlighted areas are approximate training regions, not measurements of muscle activation. Grip, equipment, and technique may shift emphasis.</p></div></div></section>';
 }
-const VERIFIED_PUBLIC_VIDEO_LINKS={
- 'ez-bar-biceps-curl':{
- title:'EZ-bar curl compared with straight-bar curl',
- url:'https://commons.wikimedia.org/wiki/File:Video_of_EZ_Bar_Curl_and_Straight_Bar_Curl.webm',
- publisher:'Colossus Fitness via Wikimedia Commons',
- license:'CC BY 3.0',
- description:'Demonstrates and compares EZ-bar and straight-bar curls. Confirm hand position and controlled technique.'
- }
-};
+const VERIFIED_PUBLIC_VIDEO_LINKS={"incline-cable-chest-press":{"url":"https://www.youtube.com/watch?v=chvZZIWje0M","title":"Incline cable chest press — form demonstration","provider":"OriGym","match":"exact","note":"","kind":"youtube"},"neutral-grip-chest-press-machine":{"url":"https://commons.wikimedia.org/wiki/File:Muscle_Strengthening_at_the_Gym_-_Chest_Press.webm","video":"https://upload.wikimedia.org/wikipedia/commons/7/70/Muscle_Strengthening_at_the_Gym_-_Chest_Press.webm","title":"Seated chest press machine","provider":"Centers for Disease Control and Prevention","match":"related","note":"Machine-grip style may differ from your neutral-grip press.","kind":"commons","license":"US public domain"},"rope-triceps-pushdown":{"url":"https://www.muscleandstrength.com/exercises/rope-tricep-extension.html","title":"Rope triceps pushdown","provider":"Muscle & Strength","match":"exact","note":"","kind":"guide"},"overhead-cable-triceps-extension":{"url":"https://www.muscleandstrength.com/exercises/overhead-tricep-extension.html","title":"Overhead rope cable triceps extension","provider":"Muscle & Strength","match":"related","note":"Shows a high-pulley rope version; match the cable setup at your gym.","kind":"guide"},"close-grip-lat-pulldown":{"url":"https://www.muscleandstrength.com/exercises/close-grip-pull-down.html","title":"Close-grip lat pulldown","provider":"Muscle & Strength","match":"related","note":"The guide's handle and grip orientation may differ from your close neutral grip.","kind":"guide"},"ez-bar-biceps-curl":{"url":"https://commons.wikimedia.org/wiki/File:Video_of_EZ_Bar_Curl_and_Straight_Bar_Curl.webm","video":"https://upload.wikimedia.org/wikipedia/commons/e/ec/Video_of_EZ_Bar_Curl_and_Straight_Bar_Curl.webm","title":"EZ-bar curl demonstration and comparison","provider":"Colossus Fitness","match":"exact","note":"Includes a comparison to straight-bar curls.","kind":"commons","license":"CC BY 3.0"},"cable-crunch":{"url":"https://www.muscleandstrength.com/exercises/cable-crunch.html","title":"Kneeling cable crunch","provider":"Muscle & Strength","match":"exact","note":"","kind":"guide"},"pallof-press":{"url":"https://www.muscleandstrength.com/exercises/pallof-press","title":"Standing Pallof press","provider":"Muscle & Strength","match":"exact","note":"","kind":"guide"},"hack-squat":{"url":"https://www.muscleandstrength.com/exercises/hack-squat.html","title":"Machine hack squat","provider":"Muscle & Strength","match":"exact","note":"","kind":"guide"},"seated-leg-curl":{"url":"https://www.muscleandstrength.com/exercises/seated-leg-curl","title":"Seated hamstring curl","provider":"Muscle & Strength","match":"exact","note":"","kind":"guide"},"leg-press-calf-raise":{"url":"https://www.muscleandstrength.com/exercises/45-degress-calf-press.html","title":"45-degree leg press calf raise","provider":"Muscle & Strength","match":"exact","note":"","kind":"guide"},"cable-lateral-raise":{"url":"https://www.muscleandstrength.com/exercises/one-arm-cable-lateral-raise.html","title":"Single-arm cable lateral raise","provider":"Muscle & Strength","match":"related","note":"Shows the cross-body cable setup, which may differ from your version.","kind":"guide"},"reverse-pec-deck":{"url":"https://www.muscleandstrength.com/exercises/machine-reverse-fly","title":"Reverse pec deck / machine reverse fly","provider":"Muscle & Strength","match":"exact","note":"","kind":"guide"},"seated-shoulder-press-machine":{"url":"https://www.muscleandstrength.com/exercises/machine-shoulder-press","title":"Seated machine shoulder press","provider":"Muscle & Strength","match":"exact","note":"","kind":"guide"},"pec-deck-fly":{"url":"https://www.muscleandstrength.com/exercises/pec-dec.html","title":"Pec deck fly","provider":"Muscle & Strength","match":"exact","note":"","kind":"guide"},"straight-bar-triceps-pushdown":{"url":"https://www.muscleandstrength.com/exercises/tricep-extension.html","title":"Straight-bar triceps pushdown","provider":"Muscle & Strength","match":"exact","note":"","kind":"guide"},"dumbbell-skull-crusher":{"url":"https://www.muscleandstrength.com/exercises/lying-dumbbell-extension.html","title":"Lying dumbbell skull crushers","provider":"Muscle & Strength","match":"exact","note":"","kind":"guide"},"lat-pulldown":{"url":"https://www.muscleandstrength.com/exercises/lat-pull-down.html","title":"Lat pulldown","provider":"Muscle & Strength","match":"exact","note":"","kind":"guide"},"straight-arm-cable-pulldown":{"url":"https://www.muscleandstrength.com/exercises/straight-arm-lat-pull-down.html","title":"Straight-arm cable pulldown","provider":"Muscle & Strength","match":"exact","note":"","kind":"guide"},"45-leg-press":{"url":"https://commons.wikimedia.org/wiki/File:Hip_Sled_-_How_to_perform_a_45_degree_leg_press.webm","video":"https://upload.wikimedia.org/wikipedia/commons/4/44/Hip_Sled_-_How_to_perform_a_45_degree_leg_press.webm","title":"45-degree sled leg press","provider":"FitnessScape","match":"exact","note":"Equipment dimensions and safety catches vary.","kind":"commons","license":"CC BY 3.0"},"leg-extension":{"url":"https://www.muscleandstrength.com/exercises/leg-extension.html","title":"Seated leg extension","provider":"Muscle & Strength","match":"exact","note":"","kind":"guide"},"hip-adductor-machine":{"url":"https://www.muscleandstrength.com/exercises/hip-adduction-machine.html","title":"Hip adduction machine","provider":"Muscle & Strength","match":"exact","note":"","kind":"guide"}};
 function demoDestination(ex){
  const id=String(ex?.id||ex?.exerciseId||'');
  const custom=safeExerciseVideo((state.videoLinks||{})[id]);
  const reviewed=VERIFIED_PUBLIC_VIDEO_LINKS[id];
- return custom?{url:custom,label:'My video',curated:true}:reviewed?{url:reviewed.url,label:'Source video',curated:true}:{url:exerciseVideoSearch(ex),label:'Find video',curated:false};
+ return custom?{url:custom,label:'My video',curated:true}:reviewed?{url:reviewed.url,label:reviewed.match==='related'?'Related demo':'Watch demo',curated:true}:{url:exerciseVideoSearch(ex),label:'Find demo',curated:false};
 }
 function exerciseQuickActions(ex,compact=false){
  const id=String(ex?.id||ex?.exerciseId||''),dest=demoDestination(ex);
@@ -1193,6 +1223,7 @@ function act(button){const action=button.dataset.action;const exIndex=Number(but
   case 'open-media':{ui.mediaStage=button.dataset.stage||'warmup';ui.mediaType=button.dataset.type||getPlan(ui.selectedPlan)?.type||'push';ui.activeVideo='';go('media');return;}
   case 'media-stage':ui.mediaStage=button.dataset.stage||'warmup';ui.activeVideo='';render();return;
   case 'media-type':ui.mediaType=button.dataset.type||'push';ui.activeVideo='';render();return;
+  case 'play-reviewed-video':{const id=button.dataset.id;ui.activeVideo=ui.activeVideo==='reviewed-'+id?'':'reviewed-'+id;render();document.getElementById('featuredExerciseVideo')?.scrollIntoView({block:'center'});return;}
   case 'play-media':ui.activeVideo=ui.activeVideo===button.dataset.key?'':button.dataset.key;render();return;
   case 'save-media-custom':{const value=($('#personal-video-input')?.value||'').trim(),url=safeExerciseVideo(value),key=button.dataset.key;
  if(!url){toast('Please enter a working HTTPS video or exercise reference URL.',true);return;}
