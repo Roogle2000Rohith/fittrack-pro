@@ -52,3 +52,8 @@ The app shell, muscle diagrams, form instructions and browser-stored logs can wo
 Serve `index.html`, `sw.js`, `manifest.webmanifest` and `icons/icon.svg` from **GitHub Pages → main → /(root)**. After publishing, refresh the website online and reopen any installed PWA to receive updated app-shell assets. See [QA_CHECKLIST.md](QA_CHECKLIST.md) for real phone/browser tests.
 
 **Limitations:** Source-level automated checks passed for the video mappings and app logic, but third-party playback on each real mobile browser and every external URL has not been end-to-end tested. Verify on your own phone before relying on this for general public production.
+
+
+## Maintainable source layout (v17)
+
+The single-file app is now organized into separate HTML, CSS, training-data and JavaScript files. Update `assets/js/video-data.js` for warm-up/cool-down and exercise video references; update `assets/js/exercise-data.js` for anatomy/illustrations; `assets/js/guides.js` for coaching cues; and `assets/js/app.js` for application behavior. See [ARCHITECTURE.md](ARCHITECTURE.md). Default phase video cards use verified YouTube video pages by E3 Rehab, Renaissance Periodization, Squat University and Tom Peto Training with direct source buttons and optional embeds. Media still requires internet and publisher permission.
