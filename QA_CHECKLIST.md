@@ -1,3 +1,18 @@
+# Modular release smoke tests — v17
+
+- [ ] Load GitHub Pages and verify browser Network tab: base.css, features.css, theme.css, guides.js, exercise-data.js, video-data.js, app.js all return HTTP 200
+- [ ] Open Video Coach → Warm-up → Push: E3 Rehab video card has **Watch original** and **Play in FitTrack**
+- [ ] Warm-up → Pull: E3 Rehab and warm-up education video are visible
+- [ ] Warm-up → Legs + Shoulders: Squat University video is visible
+- [ ] Cool-down → Push/Pull: Tom Peto upper-body cooldown video is visible
+- [ ] Cool-down → Legs + Shoulders: Tom Peto lower-body cooldown video is visible
+- [ ] Mobility: actual video links appear, not only search fields
+- [ ] Open an original video if YouTube blocks embedding: original link must remain visible
+- [ ] Resume an unfinished workout, log a set, refresh and verify local data was preserved
+- [ ] Installed PWA works after the v17 cache update and loads core UI offline
+- [ ] Verify no login or storage reset is required after splitting code files
+
+---
 # FitTrack release checks — v14
 
 Check on Android Chrome, iOS Safari and desktop Chrome/Edge, including 320px, 360px, 390px and 1280px widths.
