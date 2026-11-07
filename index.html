@@ -764,9 +764,15 @@ const REPDB_VISUALS = {"incline-cable-chest-press":{"n":"Cable Chest Press","s":
 const MEDIA_MATCH_TIER={"incline-cable-chest-press":"related","neutral-grip-chest-press-machine":"similar","high-to-low-cable-fly":"similar","rope-triceps-pushdown":"similar","single-arm-high-to-low-cable-lat-pull":"similar","hip-thrust-machine":"related","leg-press-calf-raise":"related","straight-bar-triceps-pushdown":"similar","chest-supported-wide-elbow-row":"similar","cable-drag-curl":"related","45-leg-press":"similar","chest-supported-rear-delt-row":"related","cable-shrugs":"related"};
 function mediaMatchTier(id){return MEDIA_MATCH_TIER[id]||'exact';}
 function visibleRelated(id){return !!state.mediaOverrides?.[id];}
-function safeExerciseVideo(url){try{const u=new URL(String(url||''));if(u.protocol!=='https:')return '';let host=u.hostname.toLowerCase().replace(/^www\./,'');return ['youtube.com','m.youtube.com','youtube-nocookie.com','youtu.be','vimeo.com','player.vimeo.com','commons.wikimedia.org'].includes(host)?u.href:'';}catch{return '';}}
-const VIDEO_EXACT_FIXES={'incline-cable-chest-press':{title:'Incline cable chest press: 30-second form tutorial',provider:'FlexXP',url:'https://vimeo.com/962614569',detail:'Shows an incline cable chest press on a bench between pulleys. Watch from the original Vimeo page if embedding is restricted.',match:'exact'}};
-function chosenVideo(id){return VIDEO_EXACT_FIXES[id]||VERIFIED_EXERCISE_VIDEOS[id]||null;}
+function safeExerciseVideo(value){
+ try{const u=new URL(String(value||''));if(u.protocol!=='https:'||u.username||u.password||u.href.length>1500)return '';
+ const h=u.hostname.toLowerCase().replace(/^www\./,'');
+ if((h==='vimeo.com'||h==='player.vimeo.com')&&/^(?:\/video)?\/962614569(?:\/|$)/.test(u.pathname))return '';
+ return u.href;
+ }catch{return '';}
+}
+const VIDEO_EXACT_FIXES={};
+function chosenVideo(id){return null;}
 function licensedMedia(ex){return REPDB_VISUALS[String(ex?.id||ex?.exerciseId||'')]||null;}
 function mediaImg(path){return REPDB_SOURCE+path;}
 function exerciseMediaGallery(ex){
@@ -785,16 +791,7 @@ function exerciseMediaThumb(ex){
  return `<span class="exercise-thumb repdb-thumb ${variant?'reference-variant':'reference-exact'}" title="${esc(variant?'Similar reference: '+m.n+' — not an exact match':'Exercise form reference: '+m.n)}"><span>Image needs internet</span><img src="${esc(mediaImg(m.s))}" loading="lazy" decoding="async" alt="${esc(variant?'Related movement: '+m.n:m.n)}" onerror="this.style.display='none'"/><span class="image-match-label ${variant?'variant':'exact'}">${variant?'SIMILAR':'GUIDE'}</span></span>`;
 }
 
-const VERIFIED_EXERCISE_VIDEOS={
- 'close-grip-lat-pulldown':{title:'Lat pulldown: lats and arm path',provider:'ATHLEAN-X',url:'https://www.youtube.com/watch?v=OcFCHdQHjVU',detail:'Related pulldown technique; not necessarily your exact close-grip attachment. Avoid swinging weight.'},
- 'lat-pulldown':{title:'Lat pulldown: lats and arm path',provider:'ATHLEAN-X',url:'https://www.youtube.com/watch?v=OcFCHdQHjVU',detail:'General lat pulldown coaching, not your exact machine.'},
- 'hip-thrust-machine':{title:'Proper hip thrust technique',provider:'Bret Contreras',url:'https://www.youtube.com/watch?v=LM8XHLYJoYs',detail:'A barbell hip thrust demonstration; your glute-drive machine setup differs. Avoid overextending your lower back.'},
- 'seated-leg-curl':{title:'Seated leg curl — proper technique',provider:'NASM',url:'https://www.youtube.com/watch?v=_2Kd0d-JEUM',detail:'Machine adjustment and controlled hamstring curl demonstration.'},
- '45-leg-press':{title:'How to leg press with good technique',provider:'Jeff Nippard',url:'https://www.youtube.com/watch?v=nDh_BlnLCGc',detail:'Related leg-press demonstration. Avoid letting your pelvis roll off the pad, particularly given your previous back discomfort.'},
- 'cable-lateral-raise':{title:'Cable lateral raise explained (7:57)',provider:'Jeff Nippard',url:'https://www.youtube.com/watch?v=SgyUoY0IZ7A&t=477s',detail:'Part of a longer shoulder exercise review. Cable lateral raise section starts at 7:57.'},
- 'reverse-pec-deck':{title:'Reverse pec deck explained (10:26)',provider:'Jeff Nippard',url:'https://www.youtube.com/watch?v=SgyUoY0IZ7A&t=626s',detail:'Part of a longer shoulder exercise review. Reverse pec deck section starts at 10:26.'},
- 'seated-shoulder-press-machine':{title:'Machine shoulder press explained (5:49)',provider:'Jeff Nippard',url:'https://www.youtube.com/watch?v=SgyUoY0IZ7A&t=349s',detail:'Part of a longer shoulder exercise review. Machine shoulder press section starts at 5:49.'}
-};
+const VERIFIED_EXERCISE_VIDEOS={};
 const REFERENCE_VIDEOS = {
   'incline-cable-chest-press': {title:'Related incline press movement',url:'https://commons.wikimedia.org/wiki/File:Incline_press_-_exercise_demonstration_video.webm',author:'FitnessScape',license:'CC BY 3.0',note:'This demonstration may use different equipment from your incline cable press.'},
   'ez-bar-biceps-curl': {title:'EZ-bar curl technique video',url:'https://commons.wikimedia.org/wiki/File:Video_of_EZ_Bar_Curl_and_Straight_Bar_Curl.webm',author:'Colossus Fitness',license:'CC BY 3.0',note:'Video compares EZ-bar and straight-bar curls.'},
@@ -807,24 +804,24 @@ function videoGuide(id){
  const selected=custom?{title:'Your saved technique video',provider:'Personal reference',url:custom}:suggestion;
  const card=selected?videoPreviewCard(selected,id,{search:exerciseVideoSearch(ex)}):'<div class="match-warning"><strong>Exact video not selected yet.</strong><p>Use the targeted search below to find a movement with matching equipment and setup.</p></div>';
  const ref=REFERENCE_VIDEOS[id];const extra=ref?`<p class="video-source"><a href="${esc(ref.url)}" target="_blank" rel="noopener noreferrer">Related Wikimedia reference ↗</a> · ${esc(ref.note)}</p>`:'';
- return `<section class="panel guide-video video-coach-guide"><div class="guide-section-title"><span class="guide-marker">▶</span><h3>Exercise technique videos</h3></div><p class="video-source">Watch the original video for best reliability. Embedded playback depends on the publisher and your browser.</p>${card}${extra}<a class="btn secondary small video-search-cta" href="${esc(exerciseVideoSearch(ex))}" target="_blank" rel="noopener noreferrer">⌕ Search exact ${esc(ex.name)} technique ↗</a><label for="customVideoUrl" class="video-label">My preferred YouTube/Vimeo demonstration</label><div class="video-input-row"><input id="customVideoUrl" type="url" placeholder="Paste YouTube or Vimeo URL" value="${esc(custom)}" aria-label="Your technique video"/><button class="btn secondary small" data-action="save-video-link">Save</button>${custom?'<button class="btn ghost small" data-action="clear-video-link">Remove</button>':''}</div><p class="video-source">Saved only on this device. Video files are not copied or redistributed.</p></section>`;
+ return `<section class="panel guide-video video-coach-guide"><div class="guide-section-title"><span class="guide-marker">▶</span><h3>Exercise technique videos</h3></div><p class="video-source">Watch the original video for best reliability. Embedded playback depends on the publisher and your browser.</p>${card}${extra}<a class="btn secondary small video-search-cta" href="${esc(exerciseVideoSearch(ex))}" target="_blank" rel="noopener noreferrer">⌕ Search exact ${esc(ex.name)} technique ↗</a><label for="customVideoUrl" class="video-label">My preferred YouTube/Vimeo demonstration</label><div class="video-input-row"><input id="customVideoUrl" type="url" placeholder="Paste any HTTPS video link" value="${esc(custom)}" aria-label="Your technique video"/><button class="btn secondary small" data-action="save-video-link">Save</button>${custom?'<button class="btn ghost small" data-action="clear-video-link">Remove</button>':''}</div><p class="video-source">Saved only in this browser. Videos remain on their original websites.</p></section>`;
 }
 // Exercise video layer. Only links are stored; media is never copied or cached.
 const FEATURED_MEDIA={
  warmup:{
-  push:[{title:'5-minute dynamic full-body pre-workout routine',provider:'ATHLEAN-X',url:'https://www.youtube.com/watch?v=AGj7wEn1jLo',detail:'Short dynamic preparation; follow with light ramp-up pressing sets.'}],
-  pull:[{title:'5-minute dynamic full-body pre-workout routine',provider:'ATHLEAN-X',url:'https://www.youtube.com/watch?v=AGj7wEn1jLo',detail:'Use the shoulder and upper-back drills; follow with light row/pulldown sets.'}],
-  legs:[{title:'5-minute dynamic full-body pre-workout routine',provider:'ATHLEAN-X',url:'https://www.youtube.com/watch?v=AGj7wEn1jLo',detail:'Start gently; do not force back or hip range.'},{title:'Squat warm-up and ankle/hip control',provider:'Squat University',url:'https://www.youtube.com/watch?v=pCEpcIo-O4I',detail:'Optional demonstration. Use a comfortable depth and very light load.'}]
+ push:[{title:'Dynamic upper-body warm-up',detail:'Easy shoulder and upper-back movement before pressing.',query:'E3 Rehab dynamic upper body warm up'},{title:'Progressive warm-up sets before pressing',detail:'Ramp up the load gradually before challenging sets.',query:'Renaissance Periodization bench press warmup sets'}],
+ pull:[{title:'Scapular control and upper-back warm-up',detail:'Comfortable arm and shoulder movement before rowing.',query:'E3 Rehab shoulder blade warmup exercises'}],
+ legs:[{title:'Hip and ankle preparation',detail:'Controlled mobility without forcing uncomfortable positions.',query:'Squat University squat ankle hip mobility'},{title:'Warming up for leg press or hack squat',detail:'Increase resistance in small steps.',query:'Renaissance Periodization leg press hack squat warm up sets'}]
  },
  cooldown:{
-  push:[{title:'5-minute upper-body cooldown stretch',provider:'Tom Peto Training',url:'https://www.youtube.com/watch?v=0ZkuKwjyWtI',detail:'Gentle stretches after lifting. Skip any painful position.'}],
-  pull:[{title:'5-minute upper-body cooldown stretch',provider:'Tom Peto Training',url:'https://www.youtube.com/watch?v=0ZkuKwjyWtI',detail:'Follow with easy walking and comfortable mobility.'}],
-  legs:[{title:'5-minute lower-body cooldown stretch',provider:'Workout with Roxanne',url:'https://www.youtube.com/watch?v=_FnoTkJzZgA',detail:'Use pain-free positions; stop any movement that irritates your back.'}]
+ push:[{title:'Gentle upper-body cooldown',detail:'Easy mobility after pressing.',query:'E3 Rehab shoulder chest mobility'}],
+ pull:[{title:'Upper-back mobility',detail:'Comfortable thoracic rotation and shoulder movement.',query:'E3 Rehab thoracic mobility'}],
+ legs:[{title:'Lower-body cooldown',detail:'Gentle lower-body motion after training.',query:'E3 Rehab hip mobility cool down'}]
  },
  mobility:[
-  {title:'Top 3 ankle mobility exercises',provider:'Squat University',url:'https://www.youtube.com/watch?v=IikP_teeLkI',detail:'Useful reference for ankle mobility; do not force a pinching joint.'},
-  {title:'Dynamic 5-minute full-body mobility',provider:'ATHLEAN-X',url:'https://www.youtube.com/watch?v=AGj7wEn1jLo',detail:'Optional dynamic mobility tutorial.'},
-  {title:'Squat hip and ankle mobility prep',provider:'Squat University',url:'https://www.youtube.com/watch?v=pCEpcIo-O4I',detail:'Choose unloaded modifications when needed.'}
+ {title:'90/90 hip rotations',detail:'Smooth controlled hip movement.',query:'E3 Rehab 90 90 hip mobility'},
+ {title:'Ankle dorsiflexion mobility',detail:'Ankle flexibility for squat variations.',query:'Squat University ankle dorsiflexion mobility'},
+ {title:'Thoracic rotation',detail:'Gentle upper-back rotation.',query:'E3 Rehab thoracic spine rotation mobility'}
  ]
 };
 function videoSearchUrl(query){return 'https://www.youtube.com/results?search_query='+encodeURIComponent(query+' exercise proper form tutorial');}
@@ -844,7 +841,7 @@ function videoPreviewCard(item,key,opts={}){
 function mediaClipLink(key,stage,type){ui.mediaStage=stage;ui.mediaType=type;ui.activeVideo=key;go('media');}
 function videoPack(type,stage){return FEATURED_MEDIA[stage]?.[type]||[];}
 function personalVideoCard(key,current,searchUrl){const url=(state.videoLinks||{})[key]||'';
- return `<div class="panel personal-video"><div class="guide-section-title"><span class="guide-marker">＋</span><h3>Your preferred video</h3></div><p class="muted small">Paste a YouTube or Vimeo video link. It will open in the official embedded player when allowed and will be saved locally with your backup.</p><div class="video-input-row"><input type="url" id="personal-video-input" aria-label="Personal technique video" placeholder="https://www.youtube.com/watch?v=…" value="${esc(url)}"/><button class="btn secondary small" data-action="save-media-custom" data-key="${esc(key)}">Save link</button>${url?`<button class="btn ghost small" data-action="clear-media-custom" data-key="${esc(key)}">Remove</button>`:''}</div>${url?videoPreviewCard({title:'Your saved reference video',provider:'Personal link'},key,{search:searchUrl}):''}</div>`;
+ return `<div class="panel personal-video"><div class="guide-section-title"><span class="guide-marker">＋</span><h3>Your preferred video</h3></div><p class="muted small">Paste an HTTPS video link from a trusted publisher. It opens at the original publisher, and uses a player when supported and will be saved locally with your backup.</p><div class="video-input-row"><input type="url" id="personal-video-input" aria-label="Personal technique video" placeholder="https://www.youtube.com/watch?v=…" value="${esc(url)}"/><button class="btn secondary small" data-action="save-media-custom" data-key="${esc(key)}">Save link</button>${url?`<button class="btn ghost small" data-action="clear-media-custom" data-key="${esc(key)}">Remove</button>`:''}</div>${url?videoPreviewCard({title:'Your saved reference video',provider:'Personal link'},key,{search:searchUrl}):''}</div>`;
 }
 function mediaNavigation(){return `<div class="media-tabs" role="group" aria-label="Training phase">${[['warmup','01 · Warm-up'],['exercise','02 · Exercise guides'],['cooldown','03 · Cool-down'],['mobility','04 · Mobility']].map(([id,label])=>`<button class="media-tab ${ui.mediaStage===id?'selected':''}" data-action="media-stage" data-stage="${id}">${label}</button>`).join('')}</div>`;}
 function renderMedia(){
@@ -867,12 +864,8 @@ const guideFor = ex => GUIDES[String(ex?.id||ex?.exerciseId||'')] || GUIDES[slug
 function allExercises(){const unique = new Map();for (const p of state.plan){for (const ex of p.exercises){if(!unique.has(ex.id))unique.set(ex.id,ex);}}return Array.from(unique.values());}
 function demoDestination(ex){
  const id=String(ex?.id||ex?.exerciseId||'');
- const personal=safeExerciseVideo((state.videoLinks||{})[id]);
- if(personal)return {url:personal,label:'My video',curated:true};
- const ref=chosenVideo(id);
- const url=safeExerciseVideo(ref?.url);
- if(url)return {url,label:'Watch demo',curated:true};
- return {url:exerciseVideoSearch(ex),label:'Find video',curated:false};
+ const custom=safeExerciseVideo((state.videoLinks||{})[id]);
+ return custom?{url:custom,label:'My video',curated:true}:{url:exerciseVideoSearch(ex),label:'Find video',curated:false};
 }
 function exerciseQuickActions(ex,compact=false){
  const id=String(ex?.id||ex?.exerciseId||''),dest=demoDestination(ex);
@@ -999,9 +992,11 @@ function act(button){const action=button.dataset.action;const exIndex=Number(but
   case 'media-stage':ui.mediaStage=button.dataset.stage||'warmup';ui.activeVideo='';render();return;
   case 'media-type':ui.mediaType=button.dataset.type||'push';ui.activeVideo='';render();return;
   case 'play-media':ui.activeVideo=ui.activeVideo===button.dataset.key?'':button.dataset.key;render();return;
-  case 'save-media-custom':{const value=($('#personal-video-input')?.value||'').trim();const key=button.dataset.key;try{const u=new URL(value);if(u.protocol!=='https:' || !['youtube.com','www.youtube.com','youtu.be','vimeo.com','www.vimeo.com'].includes(u.hostname.toLowerCase()))throw Error('Only YouTube or Vimeo HTTPS links');if(!embedUrl(u.href))throw Error('Unrecognized video address');state.videoLinks=state.videoLinks||{};state.videoLinks[key]=u.href;ui.activeVideo=key;queueSave();render();toast('Personal video saved on this device.');}catch{toast('Use a valid HTTPS YouTube or Vimeo video URL.',true);}return;}
+  case 'save-media-custom':{const value=($('#personal-video-input')?.value||'').trim(),url=safeExerciseVideo(value),key=button.dataset.key;
+ if(!url){toast('Please enter a working HTTPS video or exercise reference URL.',true);return;}
+ state.videoLinks=state.videoLinks||{};state.videoLinks[key]=url;ui.activeVideo='';queueSave();render();toast('Video reference saved in this browser.');return;}
   case 'clear-media-custom':{if(state.videoLinks)delete state.videoLinks[button.dataset.key];ui.activeVideo='';queueSave();render();toast('Personal video removed.');return;}
-  case 'save-video-link':{const value=($('#customVideoUrl')?.value||'').trim();if(!value){toast('Paste a video URL to save it.',true);return;}try{const u=new URL(value);if(!safeExerciseVideo(u.href)||!embedUrl(u.href))throw Error('Use a supported video URL');state.videoLinks=state.videoLinks||{};state.videoLinks[ui.guideId]=u.href;ui.activeVideo=ui.guideId;queueSave();render();toast('Technique video link saved.');}catch{toast('Enter a valid https:// video link.',true);}return;}
+  case 'save-video-link':{const value=($('#customVideoUrl')?.value||'').trim();if(!value){toast('Paste a video URL to save it.',true);return;}try{const u=new URL(value);if(!safeExerciseVideo(u.href))throw Error('Use a valid HTTPS reference URL');state.videoLinks=state.videoLinks||{};state.videoLinks[ui.guideId]=u.href;ui.activeVideo=ui.guideId;queueSave();render();toast('Technique video link saved.');}catch{toast('Enter a valid https:// video link.',true);}return;}
   case 'clear-video-link':{if(state.videoLinks)delete state.videoLinks[ui.guideId];queueSave();render();toast('Saved video link removed.');return;}
   case 'show-reference-media':{state.mediaOverrides=state.mediaOverrides||{};state.mediaOverrides[button.dataset.guide]=true;delete state.mediaOverrides['hidden:'+button.dataset.guide];queueSave();render();return;}
  case 'hide-reference-media':{state.mediaOverrides=state.mediaOverrides||{};state.mediaOverrides[button.dataset.guide]=false;state.mediaOverrides['hidden:'+button.dataset.guide]=true;queueSave();render();return;}
