@@ -273,6 +273,25 @@ html[data-contrast=high]{--muted:#d8dbea;--border:#8b7da5;--text:#fff}html[data-
 .anatomy-data{display:flex;flex-direction:column;gap:12px}.anatomy-target{display:flex;gap:11px;background:#26213a;border:1px solid #49395c;border-radius:12px;padding:13px}.muscle-dot{width:11px;height:11px;border-radius:50%;flex:0 0 11px;margin-top:4px}.muscle-dot.primary{background:#aa83ff}.muscle-dot.supporting{background:#eead66}.anatomy-label{font-size:10px;letter-spacing:.06em;color:#bcb1ce;display:block;font-weight:800;margin-bottom:4px}.anatomy-target strong{font-size:14px;line-height:1.4;display:block;color:#f3efff}.anatomy-disclaimer{font-size:11px;line-height:1.6;color:#b9accb;margin:3px 0}
 @media(max-width:690px){.anatomy-layout{grid-template-columns:1fr;gap:14px}.anatomy-card{padding:14px}.anatomy-body-pair{margin:0 auto;width:100%;max-width:340px}.anatomy-silhouette{min-height:170px}.anatomy-figure{height:202px}.anatomy-data{display:grid;grid-template-columns:1fr 1fr;gap:9px}.anatomy-target{padding:10px;gap:8px}.anatomy-target strong{font-size:12px}.anatomy-disclaimer{grid-column:1/-1}.anatomy-info-badge{white-space:nowrap}}
 </style>
+<style id="fittrack-library-modern-v11">
+.library-hero{display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid #514068;padding:22px 24px;border-radius:18px;background:radial-gradient(circle at 85% 15%,#6c3eb557,transparent 42%),linear-gradient(125deg,#24203c,#151625);margin:0 0 17px}
+.library-hero h2{font-size:25px;margin:4px 0;color:#f9f4ff}.library-hero p{color:#c6b9d6;font-size:13px;margin:5px 0;line-height:1.6}
+.library-hero-icon{width:70px;height:70px;display:grid;place-items:center;font-size:39px;color:#d7c4ff;border-radius:22px;background:#3c2a59}
+.library-search.modern-search{display:flex;align-items:center;gap:10px;margin-bottom:15px;padding:4px 14px;background:#221e35;border:1px solid #625276;border-radius:13px}
+.library-search.modern-search span{font-size:28px;color:#c9b1f4}.library-search.modern-search input{flex:1;min-width:0;background:transparent;border:0;outline:0;font-size:15px;color:#fff;padding:13px 0;min-height:46px}
+.modern-tabs{display:flex!important;gap:8px;flex-wrap:wrap;margin:0 0 14px}.modern-tabs .filter-chip{min-height:43px;display:inline-flex;align-items:center;gap:8px;background:#27213a;color:#e2d8ec;border:1px solid #4d4064;border-radius:100px;padding:10px 14px;font-size:13px;font-weight:750}
+.modern-tabs .filter-chip.active{background:#9d75ff;color:#100b20;border-color:#9d75ff;box-shadow:0 3px 15px #946cff2e}
+.tab-count{display:grid;place-items:center;min-width:22px;height:21px;padding:0 5px;border-radius:20px;background:#4c3c64;color:#e6dcf8;font-size:10px;font-weight:800}.filter-chip.active .tab-count{background:#311955;color:#fff}
+.library-summary{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:#b9adc8;margin:14px 3px}
+.modern-library-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.modern-library-item{display:grid;grid-template-columns:70px 1fr 15px;gap:11px;align-items:center;text-align:left;background:linear-gradient(135deg,#24203b,#1a192b);border:1px solid #3e3655;border-radius:15px;padding:13px;min-height:98px;cursor:pointer}
+.modern-library-item:hover{border-color:#a78bfa;background:#302544}.modern-library-item .library-thumb{width:70px;height:70px;overflow:hidden;border-radius:10px;background:#2f2b42}
+.modern-library-item .exercise-thumb{width:100%;height:100%}.modern-library-item strong{font-size:14px;line-height:1.4;color:#f5eeff}
+.modern-library-item small{font-size:11px;line-height:1.5;color:#c6bcda;margin-top:4px}.modern-library-item .library-card-meta{display:block;color:#a991ed;font-size:10px;font-weight:750;margin-top:7px}
+.modern-library-item .library-chevron{font-size:24px;color:#a88ceb}.library-empty{grid-column:1/-1}
+@media(max-width:760px){.modern-library-grid{grid-template-columns:1fr}.library-hero{padding:17px}.library-hero h2{font-size:21px}.library-hero-icon{width:53px;height:53px;font-size:30px}.modern-tabs{overflow-x:auto;flex-wrap:nowrap;scroll-snap-type:x proximity;scrollbar-width:none;margin-right:-12px;padding:4px 12px 12px 0}.modern-tabs::-webkit-scrollbar{display:none}.modern-tabs .filter-chip{flex:none;scroll-snap-align:start;min-height:44px}.library-summary span:last-child{display:none}}
+@media(min-width:1250px){.modern-library-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.modern-library-item{grid-template-columns:64px 1fr 10px}.modern-library-item .library-thumb{width:64px;height:64px}}
+</style>
 </head>
 <body>
   <div class="app-layout">
@@ -937,10 +956,53 @@ function splitCues(value){return String(value||'').split(/;\s*/).map(v=>v.trim()
 function guideLink(ex,label='Technique guide',kind='secondary'){return `<button class="btn ${kind} small guide-button" data-action="open-guide" data-guide="${esc(ex.id||ex.exerciseId||slug(ex.name))}">${esc(label)} ↗</button>`;}
 function guideReturn(){const back=ui.guideBack||'library';go(back==='guide'?'library':back);if(back==='session'&&state.draft){const i=state.draft.exercises.findIndex(x=>x.exerciseId===ui.guideId);if(i>=0)setTimeout(()=>document.getElementById(`exercise-${i}`)?.scrollIntoView({block:'start',behavior:'smooth'}),50);}}
 function goGuide(id,back=ui.view){ui.guideId=String(id);ui.guideBack=back==='guide'?'library':back;ui.view='guide';history.replaceState(null,'',`#guide/${encodeURIComponent(ui.guideId)}`);render();window.scrollTo({top:0,behavior:'instant'});}
-function renderLibraryList(){const target=$('#guideLibraryResults');if(!target)return;const text=ui.libraryQuery.trim().toLowerCase();const exercises=allExercises().filter(ex=>{const g=guideFor(ex);const terms=[ex.name,ex.group,g?.primary,g?.secondary].join(' ').toLowerCase();return (ui.libraryGroup==='All'||(ex.group===ui.libraryGroup))&&terms.includes(text);});target.innerHTML=exercises.length?exercises.map(ex=>`<button class="library-exercise" data-action="open-guide" data-guide="${esc(ex.id)}"><span>${guideThumb(ex)}</span><span class="library-exercise-copy"><strong>${esc(ex.name)}</strong><small>${esc(guideFor(ex)?.primary||ex.group)} · ${guideFor(ex)?'start/finish photos + coaching':'Custom exercise notes'}</small></span><span class="library-chevron">›</span></button>`).join(''):`<div class="empty">No exercises found. Try a different search.</div>`;
-  const count=$('#guideResultsCount');if(count)count.textContent=`${exercises.length} exercise${exercises.length===1?'':'s'}`;
+const LIBRARY_TABS=['All','Chest','Back','Legs','Shoulders','Arms','Core'];
+function exerciseCategoryMatch(ex,category){
+ if(category==='All')return true;
+ const g=String(ex.group||'');
+ return ({
+ Chest:['Chest'],
+ Back:['Back','Traps'],
+ Legs:['Quads','Hamstrings','Glutes','Calves','Adductors'],
+ Shoulders:['Shoulders','Traps'],
+ Arms:['Biceps','Triceps','Forearms'],
+ Core:['Core']
+ })[category]?.includes(g)||false;
 }
-function renderLibrary(){const list=allExercises();const groups=['All',...new Set(list.map(x=>x.group))];return `${head('LEARN THE MOVEMENT','Exercise library','Licensed exercise illustrations, useful video references and technique cues for your plan.')}<div class="guide-intro panel"><div class="guide-intro-icon">◧</div><div><h3>Form first. Progress follows.</h3><p>Browse the exercises in your PPL program. Illustrations show the nearest available exercise variation; check the equipment notes. Adjust to your machine and body, and use a trainer when unsure.</p></div></div><div class="library-search"><span>⌕</span><input id="librarySearch" aria-label="Search exercises" autocomplete="off" placeholder="Search chest, lats, hip thrust…" value="${esc(ui.libraryQuery)}"/></div><div class="library-filters">${groups.map(g=>`<button class="filter-chip ${ui.libraryGroup===g?'active':''}" data-action="guide-filter" data-group="${esc(g)}">${esc(g)}</button>`).join('')}</div><div class="library-count" id="guideResultsCount">${list.length} exercises</div><div id="guideLibraryResults" class="library-results">${list.map(ex=>`<button class="library-exercise" data-action="open-guide" data-guide="${esc(ex.id)}"><span>${guideThumb(ex)}</span><span class="library-exercise-copy"><strong>${esc(ex.name)}</strong><small>${esc(guideFor(ex)?.primary||ex.group)} · ${guideFor(ex)?'start/finish photos + coaching':'Custom exercise notes'}</small></span><span class="library-chevron">›</span></button>`).join('')}</div>`;}
+function libraryResults(){
+ const filter=LIBRARY_TABS.includes(ui.libraryGroup)?ui.libraryGroup:'All';
+ const text=ui.libraryQuery.trim().toLowerCase();
+ return allExercises().filter(ex=>{
+  const g=guideFor(ex);
+  const terms=[ex.name,ex.group,g?.primary,g?.secondary].filter(Boolean).join(' ').toLowerCase();
+  return exerciseCategoryMatch(ex,filter)&&terms.includes(text);
+ });
+}
+function libraryRow(ex){
+ const g=guideFor(ex);
+ return `<button class="library-exercise modern-library-item" data-action="open-guide" data-guide="${esc(ex.id)}" aria-label="${esc('View '+ex.name+' form and muscle anatomy')}">
+  <span class="library-thumb">${guideThumb(ex)}</span><span class="library-exercise-copy"><strong>${esc(ex.name)}</strong>
+  <small>${esc(g?.primary||ex.group)}${g?.secondary&&g.secondary!=='—'?' · '+esc(g.secondary):''}</small>
+  <span class="library-card-meta">View anatomy · Technique · Video sources</span></span><span class="library-chevron">›</span>
+ </button>`;
+}
+function renderLibraryList(){
+ const el=$('#guideLibraryResults');if(!el)return;
+ const results=libraryResults();
+ el.innerHTML=results.length?results.map(libraryRow).join(''):`<div class="empty library-empty"><strong>No matching exercises</strong><p>Try All muscles, another muscle group, or clear the search field.</p></div>`;
+ const count=$('#guideResultsCount');if(count)count.textContent=results.length+' exercise'+(results.length===1?'':'s')+' · '+(ui.libraryGroup||'All');
+}
+function renderLibrary(){
+ const list=libraryResults();
+ return `${head('EXERCISE LIBRARY','Find your movement.','Explore muscle anatomy, correct technique and reference videos for every programmed exercise.')}
+ <div class="library-hero"><div><span class="mini-label">34 EXERCISES · SIX-DAY PPL</span><h2>Train with intention.</h2><p>Choose a muscle group, find an exercise, and see exactly what it trains.</p></div><span class="library-hero-icon">◉</span></div>
+ <label class="library-search modern-search"><span aria-hidden="true">⌕</span><input id="librarySearch" autocomplete="off" aria-label="Search exercise library" placeholder="Search by exercise or muscle…" value="${esc(ui.libraryQuery)}" /></label>
+ <div class="library-filters modern-tabs" role="group" aria-label="Filter exercises by muscle group">
+ ${LIBRARY_TABS.map(t=>`<button type="button" class="filter-chip ${ui.libraryGroup===t?'active':''}" data-action="guide-filter" data-group="${esc(t)}" aria-pressed="${ui.libraryGroup===t}">
+ ${esc(t)}<span class="tab-count">${allExercises().filter(ex=>exerciseCategoryMatch(ex,t)).length}</span></button>`).join('')}</div>
+ <div class="library-summary"><span id="guideResultsCount">${list.length} exercises · ${esc(ui.libraryGroup||'All')}</span><span>Choose one to view anatomy</span></div>
+ <div id="guideLibraryResults" class="library-results modern-library-grid">${list.length?list.map(libraryRow).join(''):'<div class="empty">No matching exercises</div>'}</div>`;
+}
 function renderGuide(){const id=ui.guideId;const ex=allExercises().find(e=>e.id===id) || state.draft?.exercises.find(e=>e.exerciseId===id);if(!ex)return `${head('EXERCISE GUIDES','Guide not found','This movement might have been removed from your routine.')}<button class="btn" data-action="return-guide">← Back</button>`;const g=guideFor(ex);const sets=getLastSets(ex.id||ex.exerciseId);const activeIndex=state.draft?.exercises.findIndex(e=>e.exerciseId===(ex.id||ex.exerciseId))??-1;const focus=g?.primary||ex.group;
 const b=`<button class="back-link" data-action="return-guide">← ${ui.guideBack==='session'?'Back to workout':ui.guideBack==='plan'?'Back to plan':'Exercise library'}</button>`;
 const picture=exerciseMediaGallery(ex);
@@ -1062,7 +1124,7 @@ function act(button){const action=button.dataset.action;const exIndex=Number(but
  case 'open-guide':goGuide(button.dataset.guide,ui.view);return;
   case 'return-guide':guideReturn();return;
   case 'go-active-exercise':ui.guideId=button.dataset.guide;guideReturn();return;
-  case 'guide-filter':ui.libraryGroup=button.dataset.group||'All';render();return;
+  case 'guide-filter':ui.libraryGroup=LIBRARY_TABS.includes(button.dataset.group)?button.dataset.group:'All';render();return;
   case 'choose-week-day':{const id=calendarMap[Number(button.dataset.day)];if(!id){go('home');setTimeout(()=>$('#mobilityAnchor')?.scrollIntoView({behavior:'smooth'}),100);return;}ui.selectedPlan=id;go('plan');return;}
   case 'scroll-mobility':$('#mobilityAnchor')?.scrollIntoView({behavior:'smooth'});return;
   case 'choose-plan':ui.selectedPlan=button.dataset.plan;go('plan');return;
