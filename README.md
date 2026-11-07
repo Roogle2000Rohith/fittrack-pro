@@ -1,42 +1,46 @@
-# FitTrack Pro · Mobile-first Workout & Video Coach
+# FitTrack Pro — Muscle Anatomy & Video Coach
 
-A browser-based six-day **Push / Pull / Legs + Shoulders** tracker designed for quick gym logging on mobile and comfortable editing and analysis on desktop.
+Mobile-first workout tracker for a six-day PPL split: Push A/B, Pull A/B, and Legs + Shoulders A/B. **No backend, account, or server-side workout database.**
 
-**App URL (once GitHub Pages is enabled):** https://roogle2000rohith.github.io/fittrack-pro/
+## Website
 
-## What's included in this release
-- Six-day customized PPL A/B template, including leg machines and shoulders on leg days
-- Plan editor: adjust exercise order, sets, rep range, rest times, optional exercises
-- 34 exercise technique guides with setup cues, mistakes and movement illustrations
-- **Exercise media quality labels:** 13 different-machine / movement variations require explicit opt-in before showing related images in the full guide. Plan thumbnails visibly say SIMILAR.
-- **Video Coach:** tappable video thumbnails; large **Watch demo / Find video** buttons open the original publisher. The optional embedded YouTube/Vimeo player may be blocked by the publisher or browser.
-- Warm-up, cooldown and Sunday mobility checklists with video references
-- Workout set logger: weight, reps, RIR, warm-up/working/drop sets, prior-set one-tap copy
-- Phone-friendly set cards, rest timer that survives reload, autosaved active sessions
-- Strength trend, workout history, weekly muscle-focus sets and personal-best *logged load*
-- Optional energy/soreness session check-in
-- Weight units kg/lb, larger-text mode, high-contrast mode, reduced-motion support
-- Private local storage and JSON backup/import; CSV export of completed workout sets
+GitHub Pages (if enabled): https://roogle2000rohith.github.io/fittrack-pro/
 
-## Mobile installation
-1. In the repository open **Settings → Pages → Deploy from a branch**.
-2. Choose `main` and `/(root)`, then save.
-3. On Android Chrome open https://roogle2000rohith.github.io/fittrack-pro/ and choose **Install app** or **Add to Home screen** when offered.
-4. Open **Settings → Export JSON backup** periodically.
+## Current features
 
-## Exercise-media attribution and permissions
-- **RepDB free tier**: [Exercise data by RepDB (repdb.co)](https://repdb.co/), [repository](https://github.com/RepDB/exercise-dataset). Start/finish WebP illustrations load from the original repository, with source credit in the exercise guide. The free-tier license permits attributed in-app use but **not** redistribution as a standalone dataset. Some illustrations show *related* machines, and are explicitly labelled.
-- **wger**: [REST API](https://wger.de/api/v2/). Available as an external reference; no automatic importing of unreviewed third-party images. The software being open source does **not** automatically make every exercise photograph unrestricted.
-- **hasaneyldrm/exercises-dataset**: [Exercise dataset GitHub](https://github.com/hasaneyldrm/exercises-dataset). The images/GIFs are © Gym visual with separate rights, **not** covered by the repository's MIT code license. This app does **not** copy those GIFs.
-- **Videos**: Use provider-hosted links and their official players; no copied/rehosted video files. Links and embed permissions can change.
+- Exercise Library **All · Chest · Back · Legs · Shoulders · Arms · Core**. Filters and search work together. 34 programmed exercises, custom plan editing.
+- Every programmed exercise includes a **front/back schematic muscle anatomy map**, purple primary and orange supporting regions. Anatomical labeling is educational, not an individual EMG measurement or guarantee that every muscle works equally.
+- Technique: setup, key points, common mistakes, lower-back considerations for relevant lifts, and actual/reference equipment notes.
+- Exercise illustrations by [RepDB](https://repdb.co/) (source images served from their repo). Similar equipment illustrations are **labelled SIMILAR** and hidden by default in detailed guides until the user opts in. Photos/illustrations need connectivity.
+- Video Coach offers **YouTube, Vimeo and Wikimedia Commons** searches and editable personal HTTPS reference links. Video links are **not** downloaded or rehosted; an in-app player is offered only when supported. Embed/playback availability is controlled by the publisher.
+- **Broken Vimeo 962614569 link is blocked** and no longer used.
+- There are no blanket “verified” preset YouTube/Vimeo URLs. One source-checked demonstration is included for **EZ-bar curls**: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Video_of_EZ_Bar_Curl_and_Straight_Bar_Curl.webm) by Colossus Fitness, CC BY 3.0. This is a comparison tutorial, not a promise that the original publisher's site will stay accessible forever.
+- Workout logging: weights, reps, RIR, drop/warmup/working sets, one-tap previous-set copy, rest timer that survives refresh, autosave and resume.
+- Progress/history: weekly consistency, simplified set volume, estimated strength trends, personal best logged load and session notes. Optional energy/soreness check-in.
+- Phone-friendly set cards, six-tab mobile navigation (Home, Workout, Plan, Exercises, Videos, Progress), desktop navigation, modern purple interface.
+- kg/lb display, larger text/high contrast options, reduced-motion support.
+- Local IndexedDB with localStorage fallback; JSON backup and restore; CSV export of completed workouts.
 
-## Data and privacy
-Workout plans, session notes, sets, preferences and logs are saved **on the current device/browser** in IndexedDB, with localStorage fallback. Personal workout data is not committed to the public GitHub repository. There is no cloud sync. Browser data clearing or switching devices may erase local history. JSON backups are strongly recommended.
+## Licensing and attributions
 
-## Offline behavior
-After initial online load, the app shell, local logs and written cues can work offline through the service worker. External illustrations, video thumbnails and online videos need internet. Do not rely on YouTube/Vimeo as offline demonstrations.
+1. **RepDB images**: [Exercise data by RepDB (repdb.co)](https://repdb.co/) with attribution required for free-tier assets; inspect the repository licence for redistribution restrictions. Images are linked from their original source and **not** redistributed as a separate image dataset.
+2. **wger**: [wger REST API](https://wger.de/api/v2/) provides exercise/muscle metadata; wger software is AGPL and initial exercise data CC BY-SA 3.0. Media can have its own terms. The exercise anatomy here is currently drawn locally in FitTrack rather than remotely fetched from wger.
+3. **hasaneyldrm/exercises-dataset**: [source](https://github.com/hasaneyldrm/exercises-dataset). Gym visual GIFs have separate reuse rights and are **not** bundled with this app.
+4. **Wikimedia Commons curl video**: “Video of EZ Bar Curl and Straight Bar Curl.webm”, creator Colossus Fitness, CC BY 3.0. Linked to original page; not copied into the project.
+5. **Anatomy artwork**: Simplified original SVG regions included in FitTrack; intended as exercise target visualization, not a clinical anatomy diagram.
 
-## Deployment and testing
-The app uses inline JavaScript/CSS in `index.html`, plus `sw.js`, a web manifest and icon. No backend is required. See [QA_CHECKLIST.md](QA_CHECKLIST.md) for mobile/desktop acceptance testing. This is an actively developed personal tracker; a wider public release should also undergo multi-device end-to-end QA, accessibility review, content/video audits and privacy/security review.
+## Storage and privacy
 
-If changes don't appear on an already installed app, refresh online and close/reopen it; installed service-worker caches update during deployment. Always export a backup before destructive operations.
+Training history and plan edits live only in the browser for this origin. They are not published to GitHub. Switching browsers, clearing browsing data, reinstalling the device, or moving phones can lose logs. **Export JSON regularly** and import on a new device.
+
+## Offline details
+
+App shell, written guidance, locally stored workouts and anatomy SVGs work offline after the service worker has installed successfully. External image URLs and provider videos/searches require internet.
+
+## Release QA
+
+JavaScript syntax, content mappings, filter logic, backup schema and video URL handling can be tested automatically. Real phones and browsers still need manual testing for touch behavior, page loading, PWA updates and provider playback. Review [QA_CHECKLIST.md](QA_CHECKLIST.md).
+
+## Deployment
+
+Static files on `main` branch. Go to **Settings → Pages → Deploy from a branch → main / (root)**. Installed PWA users should refresh online and reopen the app after publishing. Browser service workers can take a refresh/restart to activate. **Back up workouts before destructive testing**.
