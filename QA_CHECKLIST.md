@@ -1,42 +1,55 @@
-# FitTrack Pro · Browser QA Checklist
+# FitTrack release checks — v14
 
-Run on **Android Chrome, iOS Safari, Windows Chrome/Edge** at 360px, 390px and 1280px layouts. Record actual device, browser version, and date for each run.
+Check on Android Chrome, iOS Safari and desktop Chrome/Edge, including 320px, 360px, 390px and 1280px widths.
 
-## Content & navigation
-- [ ] Six workouts visible (Push A/B; Pull A/B; Legs + Shoulders A/B)
-- [ ] Plan cards show full exercise names with readable lines and no overlap
-- [ ] **Watch demo** opens YouTube/Vimeo video or targeted search in a new tab
-- [ ] **Form & tips** opens the selected exercise (not adjacent exercise)
-- [ ] Tapping exercise thumbnail also opens its guide
-- [ ] Related/mismatched images carry **SIMILAR** label; full guide hides until user opts in
-- [ ] Test incline cable press (related image + exact video), chest-press machine, hack squat, hip thrust machine
-- [ ] Verify original video can play; test fallback when YouTube embedding is blocked
-- [ ] Warmup, cooldown and Sunday mobility tabs work
+## Exercises, library and anatomy
+- [ ] All filter shows 34 exercises
+- [ ] Chest filter shows 4 exercises
+- [ ] Legs includes Quads, Hamstrings, Glutes, Calves, Adductors
+- [ ] Arms includes Triceps, Biceps, Forearms
+- [ ] Core shows 4 exercises
+- [ ] Search within Chest returns only matching chest exercises
+- [ ] Search within Chest for "hack squat" returns no results
+- [ ] Every guide displays front/back primary/supporting muscle diagrams
+- [ ] Incline cable press anatomy shows Upper chest; related movement image labelled SIMILAR
+- [ ] Rear delts and quads highlight back and front regions respectively
+- [ ] Start/finish remote illustrations display online, clear fallback offline
+- [ ] No anatomy media is portrayed as measured EMG or clinical diagnosis
 
-## Workout logging and data
-- [ ] Start Push A; change weight and reps; log a set and see completed indicator
-- [ ] Reload page; confirm the active workout, sets, and timer remain
-- [ ] **Copy previous set** populates weight/reps/RIR from a previous completed session (test after completing one)
-- [ ] Check kg/lb: 20 kg displays about 44.1 lb; switching back restores 20 kg without rewriting history
-- [ ] Add warm-up/working/drop sets; mark incomplete; remove last set (with confirmation)
-- [ ] Finish a partially completed session; review saved history with correct date
-- [ ] Check personal best label only after completing a working set with weight greater than zero
-- [ ] Energy/soreness selections survive refresh and completion
-- [ ] Export JSON backup, open it, then import in a separate browser profile to verify restored history
-- [ ] Export CSV, verify heading row and correct completed set values
-- [ ] Delete a session or reset data ONLY after making a backup
+## Video references
+- [ ] Clicking video search goes to YouTube (trusted educator terms)
+- [ ] Wikimedia Commons and Vimeo search links are available
+- [ ] No video suggests the removed Vimeo ID 962614569
+- [ ] No hard-coded unreviewed YouTube video auto-opens
+- [ ] EZ-bar curl has original Wikimedia source page and attribution
+- [ ] Save a YouTube link and open original; optional embedded player
+- [ ] Save a working Vimeo page and open original; optional player
+- [ ] Save a Wikimedia or publisher HTTPS page and open original
+- [ ] Broken saved link can be removed, returning to search fallback
+- [ ] Player handles blocked embedding with clear original link
+- [ ] Video search/source link can be reached using keyboard
 
-## Mobile/accessibility
-- [ ] 320px, 360px, 390px layouts: no clipped controls or important hidden actions
-- [ ] Set inputs are sufficiently large, usable without unwanted iOS zoom
-- [ ] Keyboard Tab can reach Watch demo, form guide and set controls; focus visible
-- [ ] Large Text and High Contrast settings work and persist after refresh
-- [ ] Reduced-motion preference disables unnecessary motion
-- [ ] Offline mode: app shell and previously saved training data accessible; media shows clear fallback
-- [ ] On install: home-screen icon, standalone opening, settings and service-worker update behave correctly
+## Workout and history
+- [ ] Begin Push A, enter weights/reps and log set
+- [ ] Reload while workout active; sets remain saved
+- [ ] Rest timer survives reload; can extend and skip
+- [ ] Finish a session then view it in history/progress
+- [ ] Copy last session's set and check correct values
+- [ ] Switch units kg/lb; stored weights unchanged
+- [ ] Optional energy/soreness recorded with session
+- [ ] Export JSON, import into a second browser profile and verify history
+- [ ] CSV export opens in spreadsheets without formula injection
+- [ ] Backups remain compatible with `version: 1`
 
-## Known constraints
-- Video playback depends on original publisher and browser rules.
-- Remote illustrations do not work offline.
-- Public static hosting has no account-based sync; workout history is private to a browser origin.
-- A similar equipment setup is not a verified demonstration of the exact exercise.
+## Responsive and accessibility
+- [ ] Bottom navigation contains Home, Workout, Plan, Exercises, Videos, Progress
+- [ ] All six mobile navigation options visible and usable at 320px
+- [ ] Muscle filter chips scroll horizontally on small phones
+- [ ] Set inputs remain readable without accidental clipping/overlap
+- [ ] Large text and high contrast persist after reload
+- [ ] Reduced-motion behavior follows OS settings
+- [ ] App shell works offline after initial install; videos need internet
+- [ ] Installed PWA refreshes to v14 after new service worker activation
+
+## Release caveat
+Production/public release should additionally undergo browser end-to-end tests, license/content audit, reliability testing of external image/video sources, accessibility review, and security/privacy review.
