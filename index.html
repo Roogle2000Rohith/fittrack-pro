@@ -219,6 +219,33 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 2px #9a66ff27}
 @media(max-width:375px){.exercise-plan{grid-template-columns:26px 52px minmax(0,1fr);gap:7px}.exercise-plan .media-quick-view{width:52px;height:55px}.exercise-plan .exercise-plan-info p{font-size:11px}.exercise-quick-actions.compact .btn{padding:8px;font-size:11px;min-width:96px}.exercise-card .media-quick-view{width:45px;height:54px;flex-basis:45px}}
 @media(min-width:1000px){.exercise-plan-info strong{font-size:15px}.exercise-quick-actions{max-width:380px}.exercise-quick-actions .btn{flex:1}}
 </style>
+<style id="fittrack-set-mobile-v4">
+.set-prev-cell .previous-fill{border:1px solid #584772;background:#27233b;color:#e7d7ff;display:inline-flex;border-radius:9px;align-items:center;padding:7px 10px;font-weight:700;font-size:11px;min-height:36px;cursor:pointer;max-width:100%;white-space:normal}
+.set-prev-cell .previous-fill:hover{background:#3a2d59}
+.set-row.complete{background:rgba(91,192,139,.06)}
+@media(max-width:700px){
+ .set-table{display:block;width:100%}.set-table thead{display:none}.set-table tbody{display:block;width:100%}
+ .set-table tbody tr{display:grid;grid-template-columns:43px minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) 45px;gap:6px 8px;border:1px solid #37334d;border-radius:13px;margin:0 0 10px;padding:11px 10px;align-items:center;background:#171627}
+ .set-table tbody td{display:flex;flex-direction:column;justify-content:center;align-items:stretch;padding:0;min-width:0;border:none}
+ .set-table tbody td[data-label]::before{content:attr(data-label);font-size:10px;color:#c2b5d4;text-transform:uppercase;font-weight:800;letter-spacing:.035em;margin-bottom:5px}
+ .set-table tbody .set-type-cell{grid-column:1;grid-row:1;align-items:center}.set-table tbody .set-type-cell::before{display:none}
+ .set-table tbody .set-prev-cell{grid-column:2/5;grid-row:1;align-items:flex-start}.set-table tbody .set-prev-cell::before{display:none}
+ .set-table tbody .set-complete-cell{grid-column:5;grid-row:1/3;align-items:center;justify-content:center}
+ .set-table tbody .set-complete-cell::before{display:none}
+ .set-table tbody .set-weight-cell{grid-column:2;grid-row:2}
+ .set-table tbody .set-reps-cell{grid-column:3;grid-row:2}
+ .set-table tbody .set-rir-cell{grid-column:4;grid-row:2}
+ .set-table .set-row input,.set-table .set-row select{width:100%;min-width:0;height:44px;min-height:44px;padding:8px 5px;font-size:16px;border-radius:9px;text-align:center;font-variant-numeric:tabular-nums}
+ .set-table .set-row .complete-set{width:43px;height:52px;min-height:52px;font-size:24px;display:grid;place-items:center}
+ .set-table .set-row .set-label{min-width:37px;min-height:38px;font-size:13px}
+ .set-table .set-row .previous-fill{min-height:38px;font-size:12px}
+ .exercise-card{scroll-margin-top:72px}
+ .exercise-card .exercise-foot .buttons{display:flex;flex-wrap:wrap;gap:8px}
+ .exercise-card .exercise-foot .buttons .btn{min-height:42px}
+}
+@media(max-width:375px){.set-table tbody tr{gap:6px;padding:9px 7px;grid-template-columns:37px minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) 39px}.set-table .set-row .complete-set{width:37px}.set-table .set-row input,.set-table .set-row select{padding:6px 2px}.set-table .set-row .previous-fill{font-size:11px;padding:5px}}
+@media(min-width:701px){.set-table .set-row td{padding:8px 5px}.set-table .set-row input,.set-table .set-row select{min-height:39px;font-size:14px}}
+</style>
 </head>
 <body>
   <div class="app-layout">
@@ -877,7 +904,20 @@ function renderPlan(){const p=getPlan(ui.selectedPlan)||state.plan[0];if(!p)retu
 function newSession(planId){const p=getPlan(planId);if(!p)return;return {id:uid(),planId:p.id,name:p.name,startedAt:new Date().toISOString(),exercises:p.exercises.map(e=>({exerciseId:e.id,name:e.name,group:e.group,notes:e.notes,unit:e.unit||'reps',rest:e.rest,optional:!!e.optional,min:e.min,max:e.max,sets:Array.from({length:Number(e.sets)},()=>({id:uid(),type:'working',weight:getBestWeight(e.id),reps:'',rir:2,done:false}))})),notes:''};}
 function startWorkout(planId){if(state.draft){if(state.draft.planId===planId){go('session');return;}if(!confirm(`You still have an unfinished ${state.draft.name} session. Replace it with a new session? Your unfinished entries will be lost.`))return;}const p=getPlan(planId);if(!p){toast('Workout plan unavailable',true);return;}state.draft=newSession(planId);queueSave();go('session');toast(`${p.short} started. You've got this!`);}
 function prevText(exerciseId,unit='reps'){const vals=getLastSets(exerciseId);if(!vals.length)return 'No previous sets logged';return `Last: ${vals.slice(0,3).map(s=>`${weightDisplay(s.weight)}${weightUnit()} × ${num(s.reps)}${unit==='sec'?'s':''}`).join(' · ')}`;}
-function renderSetRow(ex,ei,s,si){const prior=getLastSets(ex.exerciseId).filter(v=>v.type!=='warmup');const pv=prior[si];return `<tr class="set-row ${s.done?'complete':''}"><td><button class="set-label ${esc(s.type==='drop'?'drop':s.type==='warmup'?'warmup':'')}" data-action="cycle-set-type" data-ex="${ei}" data-set="${si}" title="Tap to change: working → warm-up → drop">${s.type==='warmup'?'W':s.type==='drop'?'D':si+1}</button></td><td><span class="muted tiny" title="Previous workout">${pv?`${weightDisplay(pv.weight)}×${num(pv.reps)}`:'—'}</span></td><td><input aria-label="${esc(ex.name)} set ${si+1} weight in ${weightUnit()}" inputmode="decimal" type="number" step="0.5" min="0" data-ex="${ei}" data-set="${si}" data-field="weight" value="${esc(weightDisplay(s.weight))}" /></td><td><input aria-label="${esc(ex.name)} set ${si+1} ${ex.unit==='sec'?'seconds':'repetitions'}" inputmode="numeric" type="number" step="1" min="0" data-ex="${ei}" data-set="${si}" data-field="reps" value="${esc(s.reps)}" placeholder="—" /></td><td><select aria-label="${esc(ex.name)} set ${si+1} reps in reserve" data-ex="${ei}" data-set="${si}" data-field="rir">${[0,1,2,3,4,5].map(v=>`<option ${num(s.rir)===v?'selected':''} value="${v}">${v}${v===5?'+':''}</option>`).join('')}</select></td><td><button class="complete-set ${s.done?'yes':''}" data-action="toggle-set" data-ex="${ei}" data-set="${si}" title="${s.done?'Mark incomplete':'Complete this set'}">${s.done?'✓':'○'}</button></td></tr>`;}
+function renderSetRow(ex,ei,set,si){
+ const prev=getLastSets(ex.exerciseId).filter(v=>v.type===set.type);
+ const sameTypeIndex=ex.sets.slice(0,si+1).filter(v=>v.type===set.type).length-1;
+ const pv=prev[sameTypeIndex]||null;
+ const label=set.type==='warmup'?'W':set.type==='drop'?'D':si+1;
+ const prevLabel=pv?`${weightDisplay(pv.weight)} ${weightUnit()} × ${num(pv.reps)}`:'No previous set';
+ return `<tr class="set-row ${set.done?'complete':''}" data-set-type="${esc(set.type)}">
+ <td class="set-type-cell" data-label="Set"><button class="set-label ${esc(set.type==='drop'?'drop':set.type==='warmup'?'warmup':'')}" data-action="cycle-set-type" data-ex="${ei}" data-set="${si}" title="Tap to change: working → warm-up → drop">${label}</button></td>
+ <td class="set-prev-cell" data-label="Previous">${pv?`<button class="previous-fill" data-action="copy-previous-set" data-ex="${ei}" data-set="${si}" title="Copy previous values for this set" aria-label="Copy previous ${esc(ex.name)} set: ${esc(prevLabel)}">↶ ${esc(prevLabel)}</button>`:`<span class="muted tiny">—</span>`}</td>
+ <td class="set-weight-cell" data-label="${weightUnit()}"><input aria-label="${esc(ex.name)} set ${si+1} weight in ${weightUnit()}" inputmode="decimal" type="number" step="0.5" min="0" max="2000" data-ex="${ei}" data-set="${si}" data-field="weight" value="${esc(weightDisplay(set.weight))}" /></td>
+ <td class="set-reps-cell" data-label="${ex.unit==='sec'?'Seconds':'Reps'}"><input aria-label="${esc(ex.name)} set ${si+1} ${ex.unit==='sec'?'seconds':'repetitions'}" inputmode="numeric" type="number" step="1" min="0" max="500" data-ex="${ei}" data-set="${si}" data-field="reps" value="${esc(set.reps)}" placeholder="—" /></td>
+ <td class="set-rir-cell" data-label="RIR"><select aria-label="${esc(ex.name)} set ${si+1} reps in reserve" data-ex="${ei}" data-set="${si}" data-field="rir">${[0,1,2,3,4,5].map(v=>`<option ${num(set.rir)===v?'selected':''} value="${v}">${v}${v===5?'+':''}</option>`).join('')}</select></td>
+ <td class="set-complete-cell" data-label="Done"><button class="complete-set ${set.done?'yes':''}" data-action="toggle-set" data-ex="${ei}" data-set="${si}" title="${set.done?'Mark set incomplete':'Complete this set'}" aria-label="${set.done?'Mark set incomplete':'Mark set complete'}" aria-pressed="${set.done}">${set.done?'✓':'○'}</button></td></tr>`;
+}
 function progressionHint(ex){const prev=getLastSets(ex.exerciseId).filter(s=>s.type==='working');if(!prev.length)return 'First time? Pick a load you can control with about 2 reps left in reserve.';const repMax=num(ex.max);const required=ex.sets.filter(s=>s.type==='working').length;const qualified=prev.length>=required && prev.slice(0,required).every(s=>num(s.reps)>=repMax && num(s.rir)>=1 && num(s.weight)>0);return qualified?'Previous session reached the rep ceiling on all working sets: consider the smallest available weight increase if form stays solid.':'Use your previous working weight and try to add a good rep before increasing the load.';}
 function renderExerciseCard(ex,i){const done=working(ex.sets).length;const target=ex.sets.filter(s=>s.type==='working').length;return `<section class="exercise-card" id="exercise-${i}"><div class="exercise-head"><div class="idx">${i+1}</div><button class="media-quick-view" data-action="open-guide" data-guide="${esc(ex.exerciseId)}" aria-label="${esc('Open '+ex.name+' technique guide')}">${guideThumb(ex)}</button><div class="exercise-namebox"><h3>${esc(ex.name)}</h3><p>${esc(ex.group)} · ${num(ex.min)}–${num(ex.max)} ${ex.unit==='sec'?'seconds':'reps'} · ${num(ex.rest)}s rest ${ex.optional?'· Optional':''}</p><p>${esc(ex.notes||'')}</p></div>${pill(`${done}/${target} done`,done>=target&&target?'green':'')}</div>
  <div class="exercise-guide-cta">${exerciseQuickActions(ex)}</div>
@@ -937,6 +977,12 @@ function act(button){const action=button.dataset.action;const exIndex=Number(but
   case 'choose-plan':ui.selectedPlan=button.dataset.plan;go('plan');return;
   case 'preview-today':ui.selectedPlan=todayPlan()||'push-a';go('plan');return;
   case 'start-workout':startWorkout(button.dataset.plan);return;
+  case 'copy-previous-set':{
+ const ex=state.draft?.exercises[exIndex],set=ex?.sets[setIndex];if(!set)return;
+ const sameTypeIndex=ex.sets.slice(0,setIndex+1).filter(v=>v.type===set.type).length-1;
+ const prior=getLastSets(ex.exerciseId).filter(v=>v.type===set.type)[sameTypeIndex];
+ if(!prior){toast('No previous set available for this exercise.',true);return;}
+ set.weight=num(prior.weight);set.reps=num(prior.reps);set.rir=num(prior.rir,2);queueSave();render();toast('Previous set copied. Check your form and reps before marking done.');return;}
   case 'toggle-set':setDone(exIndex,setIndex);return;
   case 'cycle-set-type':setType(exIndex,setIndex);return;
   case 'add-set':addSet(exIndex,button.dataset.type);return;
