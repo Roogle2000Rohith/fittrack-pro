@@ -292,6 +292,14 @@ html[data-contrast=high]{--muted:#d8dbea;--border:#8b7da5;--text:#fff}html[data-
 @media(max-width:760px){.modern-library-grid{grid-template-columns:1fr}.library-hero{padding:17px}.library-hero h2{font-size:21px}.library-hero-icon{width:53px;height:53px;font-size:30px}.modern-tabs{overflow-x:auto;flex-wrap:nowrap;scroll-snap-type:x proximity;scrollbar-width:none;margin-right:-12px;padding:4px 12px 12px 0}.modern-tabs::-webkit-scrollbar{display:none}.modern-tabs .filter-chip{flex:none;scroll-snap-align:start;min-height:44px}.library-summary span:last-child{display:none}}
 @media(min-width:1250px){.modern-library-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.modern-library-item{grid-template-columns:64px 1fr 10px}.modern-library-item .library-thumb{width:64px;height:64px}}
 </style>
+<style id="fittrack-video-choices-v12">
+.video-source-empty{min-height:164px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;background:radial-gradient(circle at 50% 10%,#5538755c,transparent 65%),#1b1828;border:1px dashed #6a587d;border-radius:13px}
+.video-source-mark{display:grid;place-items:center;width:50px;height:50px;border-radius:17px;color:#f1e3ff;background:#46315f;font-size:32px;margin-bottom:10px}
+.video-source-empty strong{font-size:16px;color:#f0e6fb}.video-source-empty p{font-size:12px;line-height:1.6;color:#c1b2d3;margin:6px 0 0;max-width:360px}
+.video-search-choices{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 2px}.video-search-choices a{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:42px;padding:9px 12px;border-radius:10px;background:#302644;border:1px solid #64507f;color:#e9dfff;font-size:12px;font-weight:750;text-decoration:none}
+.video-search-choices a:hover{background:#463260;border-color:#ae86ff}.video-source-disclaimer{font-size:11px;line-height:1.6;margin-top:10px}.video-direct-player{width:100%;aspect-ratio:16/9;background:#06050a;border-radius:14px}
+@media(max-width:630px){.video-search-choices a{flex:1 1 140px}.video-source-empty{min-height:135px}.video-actions .btn{min-height:45px}}
+</style>
 </head>
 <body>
   <div class="app-layout">
@@ -830,8 +838,8 @@ function videoGuide(id){
  const custom=safeExerciseVideo((state.videoLinks||{})[id]);const suggestion=chosenVideo(id);
  const selected=custom?{title:'Your saved technique video',provider:'Personal reference',url:custom}:suggestion;
  const card=selected?videoPreviewCard(selected,id,{search:exerciseVideoSearch(ex)}):'<div class="match-warning"><strong>Exact video not selected yet.</strong><p>Use the targeted search below to find a movement with matching equipment and setup.</p></div>';
- const ref=REFERENCE_VIDEOS[id];const extra=ref?`<p class="video-source"><a href="${esc(ref.url)}" target="_blank" rel="noopener noreferrer">Related Wikimedia reference ↗</a> · ${esc(ref.note)}</p>`:'';
- return `<section class="panel guide-video video-coach-guide"><div class="guide-section-title"><span class="guide-marker">▶</span><h3>Exercise technique videos</h3></div><p class="video-source">Watch the original video for best reliability. Embedded playback depends on the publisher and your browser.</p>${card}${extra}<a class="btn secondary small video-search-cta" href="${esc(exerciseVideoSearch(ex))}" target="_blank" rel="noopener noreferrer">⌕ Search exact ${esc(ex.name)} technique ↗</a><label for="customVideoUrl" class="video-label">My preferred YouTube/Vimeo demonstration</label><div class="video-input-row"><input id="customVideoUrl" type="url" placeholder="Paste any HTTPS video link" value="${esc(custom)}" aria-label="Your technique video"/><button class="btn secondary small" data-action="save-video-link">Save</button>${custom?'<button class="btn ghost small" data-action="clear-video-link">Remove</button>':''}</div><p class="video-source">Saved only in this browser. Videos remain on their original websites.</p></section>`;
+ const ref=null;const extra=ref?`<p class="video-source"><a href="${esc(ref.url)}" target="_blank" rel="noopener noreferrer">Related Wikimedia reference ↗</a> · ${esc(ref.note)}</p>`:'';
+ return `<section class="panel guide-video video-coach-guide"><div class="guide-section-title"><span class="guide-marker">▶</span><h3>Exercise technique videos</h3></div><p class="video-source">Watch the original video for best reliability. Embedded playback depends on the publisher and your browser.</p>${card}${extra}${sourceVideoLinks(ex.name+' '+ex.group+' exercise proper form')}<label for="customVideoUrl" class="video-label">My preferred exercise video or reference</label><div class="video-input-row"><input id="customVideoUrl" type="url" placeholder="Paste any HTTPS video link" value="${esc(custom)}" aria-label="Your technique video"/><button class="btn secondary small" data-action="save-video-link">Save</button>${custom?'<button class="btn ghost small" data-action="clear-video-link">Remove</button>':''}</div><p class="video-source">Saved only in this browser. Videos remain on their original websites.</p></section>`;
 }
 // Exercise video layer. Only links are stored; media is never copied or cached.
 const FEATURED_MEDIA={
@@ -851,24 +859,47 @@ const FEATURED_MEDIA={
  {title:'Thoracic rotation',detail:'Gentle upper-back rotation.',query:'E3 Rehab thoracic spine rotation mobility'}
  ]
 };
+function sourceVideoSearches(query){
+ const q=String(query||'fitness exercise technique').trim();
+ return [
+  {name:'YouTube · coaching sources',url:'https://www.youtube.com/results?search_query='+encodeURIComponent(q+' Jeff Nippard E3 Rehab Renaissance Periodization')},
+  {name:'Wikimedia Commons · licensed videos',url:'https://commons.wikimedia.org/w/index.php?search='+encodeURIComponent(q)+'&title=Special:MediaSearch&type=video'},
+  {name:'Vimeo search',url:'https://vimeo.com/search?q='+encodeURIComponent(q)}
+ ];
+}
+function sourceVideoLinks(query){return '<div class="video-search-choices">'+sourceVideoSearches(query).map(x=>'<a target="_blank" rel="noopener noreferrer" href="'+esc(x.url)+'">'+esc(x.name)+' ↗</a>').join('')+'</div>';}
 function videoSearchUrl(query){return 'https://www.youtube.com/results?search_query='+encodeURIComponent(query+' exercise proper form tutorial');}
 function exerciseVideoSearch(ex){return videoSearchUrl((ex?.name||'gym exercise')+' '+(ex?.group||''));}
 function embedUrl(url){const safe=safeExerciseVideo(url);if(!safe)return '';try{const u=new URL(safe),h=u.hostname.toLowerCase().replace(/^www\./,'');const t=String(u.searchParams.get('start')||u.searchParams.get('t')||'');const m=t.match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s?)?$/i);const seconds=m?Number(m[1]||0)*3600+Number(m[2]||0)*60+Number(m[3]||0):0;if(['youtube.com','m.youtube.com','youtube-nocookie.com','youtu.be'].includes(h)){let id=h==='youtu.be'?u.pathname.split('/')[1]:u.searchParams.get('v');if(!id&&/^\/(shorts|embed|live)\//.test(u.pathname))id=u.pathname.split('/')[2];return /^[\w-]{11}$/.test(id||'')?'https://www.youtube-nocookie.com/embed/'+id+'?rel=0&playsinline=1'+(seconds?'&start='+seconds:''):'';}if(h==='vimeo.com'||h==='player.vimeo.com'){const m=u.pathname.match(/(?:\/video)?\/(\d+)(?:\/|$)/);return m?'https://player.vimeo.com/video/'+m[1]:'';}}catch{}return '';}
 function videoPreviewCard(item,key,opts={}){
- const selected=safeExerciseVideo((state.videoLinks||{})[key]||item?.url||'');
- const embed=embedUrl(selected), active=ui.activeVideo===key,title=item?.title||'Exercise demonstration',provider=item?.provider||'Video publisher';
- const search=opts.search||videoSearchUrl(title);
- let image='';try{const u=new URL(selected);const host=u.hostname.toLowerCase().replace(/^www\./,'');const id=host==='youtu.be'?u.pathname.split('/')[1]:u.searchParams.get('v')||u.pathname.match(/^\/(?:shorts|embed|live)\/([^/]+)/)?.[1];if(/^[A-Za-z0-9_-]{11}$/.test(id||''))image='https://i.ytimg.com/vi/'+id+'/hqdefault.jpg';}catch{}
- return `<section class="video-feature-card" data-video-key="${esc(key)}"><div class="video-feature-top"><div><span class="mini-label">${item?.match==='exact'?'EXACT EXERCISE':'TECHNIQUE REFERENCE'} · ${esc(provider)}</span><h3>${esc(title)}</h3>${item?.detail?`<p>${esc(item.detail)}</p>`:''}</div></div>
- ${active&&embed?`<div class="video-embed"><iframe src="${esc(embed)}" title="${esc(title)}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div><p class="video-source">Embedded playback may be restricted by the video owner. Use Watch on source below.</p>`:
- selected?`<a href="${esc(selected)}" class="video-placeholder clickable-video" rel="noopener noreferrer" target="_blank" aria-label="${esc('Watch '+title+' on the original source')}">${image?`<img class="video-poster" alt="" src="${esc(image)}" loading="lazy" onerror="this.style.display='none'"/>`:''}<span class="video-brand">${esc(provider)}</span><span class="video-hero-play" aria-hidden="true">▶</span><span class="video-bottom-note">Tap to watch at the publisher ↗</span></a>`:
- `<a href="${esc(search)}" class="video-placeholder clickable-video" target="_blank" rel="noopener noreferrer"><span class="video-hero-play">⌕</span><span class="video-bottom-note">Search for this exercise</span></a>`}
- <div class="video-actions">${selected?`<a class="btn watch-demo" href="${esc(selected)}" target="_blank" rel="noopener noreferrer">↗ Watch on source</a>`:''}${embed?`<button class="btn secondary" data-action="play-media" data-key="${esc(key)}">${active?'■ Close player':'▶ Try in-app player'}</button>`:''}<a href="${esc(search)}" class="btn ghost" target="_blank" rel="noopener noreferrer">⌕ Alternatives</a></div></section>`;
+ const selected=safeExerciseVideo((state.videoLinks||{})[key]||'');
+ const title=item?.title||'Find exercise video';
+ const query=opts.query||item?.query||title+' exercise correct technique';
+ const embed=embedUrl(selected),playing=ui.activeVideo===key;
+ let youtubePoster='';
+ try{if(selected){const u=new URL(selected),h=u.hostname.toLowerCase().replace(/^www\./,'');const id=h==='youtu.be'?u.pathname.split('/')[1]:u.searchParams.get('v')||u.pathname.match(/^\/(?:embed|shorts|live)\/([^/]+)/)?.[1];if(/^[\w-]{11}$/.test(id||''))youtubePoster='https://i.ytimg.com/vi/'+id+'/hqdefault.jpg';}}catch{}
+ let media='';
+ if(!selected)media=`<div class="video-source-empty"><span class="video-source-mark">⌕</span><strong>Find a trusted demonstration</strong><p>Choose a video showing this exact movement. Results are not automatically certified or guaranteed to work.</p></div>`;
+ else if(playing&&embed){
+   media=/\.(?:mp4|webm)$/i.test(embed)?`<video class="video-direct-player" src="${esc(embed)}" controls playsinline preload="none"></video>`:`<div class="video-embed"><iframe title="${esc(title)}" src="${esc(embed)}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`;
+ }else media=`<a class="video-placeholder clickable-video" href="${esc(selected)}" target="_blank" rel="noopener noreferrer" aria-label="Open your saved video link">${youtubePoster?`<img class="video-poster" alt="" src="${esc(youtubePoster)}" loading="lazy" onerror="this.style.display='none'"/>`:''}<span class="video-hero-play">▶</span><span class="video-bottom-note">Open on the publisher's website ↗</span></a>`;
+ return `<section class="video-feature-card" data-video-key="${esc(key)}">
+ <div class="video-feature-top"><div><span class="mini-label">${selected?'YOUR SAVED REFERENCE':'CHOOSE A SOURCE · NO UNREVIEWED DIRECT VIDEOS'}</span><h3>${esc(title)}</h3>${item?.detail?`<p>${esc(item.detail)}</p>`:''}</div></div>
+ ${media}
+ <div class="video-actions">
+ ${selected?`<a class="btn watch-demo" href="${esc(selected)}" target="_blank" rel="noopener noreferrer">↗ Watch original</a>`:''}
+ ${selected&&embed?`<button class="btn secondary" data-action="play-media" data-key="${esc(key)}">${playing?'■ Close player':'▶ Try embedded player'}</button>`:''}
+ ${selected?`<button class="btn ghost" data-action="report-video" data-key="${esc(key)}">✕ Broken link</button>`:''}
+ </div>
+ ${sourceVideoLinks(query)}
+ <p class="video-source video-source-disclaimer">Prefer a qualified coach or clinician, and match the machine, attachment and movement. Publisher links may become unavailable.</p>
+ </section>`;
 }
+
 function mediaClipLink(key,stage,type){ui.mediaStage=stage;ui.mediaType=type;ui.activeVideo=key;go('media');}
 function videoPack(type,stage){return FEATURED_MEDIA[stage]?.[type]||[];}
 function personalVideoCard(key,current,searchUrl){const url=(state.videoLinks||{})[key]||'';
- return `<div class="panel personal-video"><div class="guide-section-title"><span class="guide-marker">＋</span><h3>Your preferred video</h3></div><p class="muted small">Paste an HTTPS video link from a trusted publisher. It opens at the original publisher, and uses a player when supported and will be saved locally with your backup.</p><div class="video-input-row"><input type="url" id="personal-video-input" aria-label="Personal technique video" placeholder="https://www.youtube.com/watch?v=…" value="${esc(url)}"/><button class="btn secondary small" data-action="save-media-custom" data-key="${esc(key)}">Save link</button>${url?`<button class="btn ghost small" data-action="clear-media-custom" data-key="${esc(key)}">Remove</button>`:''}</div>${url?videoPreviewCard({title:'Your saved reference video',provider:'Personal link'},key,{search:searchUrl}):''}</div>`;
+ return `<div class="panel personal-video"><div class="guide-section-title"><span class="guide-marker">＋</span><h3>Your preferred video</h3></div><p class="muted small">Paste an HTTPS link from a trusted publisher. FitTrack opens the original source, and offers a player only when supported.</p><div class="video-input-row"><input type="url" id="personal-video-input" aria-label="Personal technique video" placeholder="https://www.youtube.com/watch?v=…" value="${esc(url)}"/><button class="btn secondary small" data-action="save-media-custom" data-key="${esc(key)}">Save link</button>${url?`<button class="btn ghost small" data-action="clear-media-custom" data-key="${esc(key)}">Remove</button>`:''}</div>${url?videoPreviewCard({title:'Your saved reference video',provider:'Personal link'},key,{search:searchUrl}):''}</div>`;
 }
 function mediaNavigation(){return `<div class="media-tabs" role="group" aria-label="Training phase">${[['warmup','01 · Warm-up'],['exercise','02 · Exercise guides'],['cooldown','03 · Cool-down'],['mobility','04 · Mobility']].map(([id,label])=>`<button class="media-tab ${ui.mediaStage===id?'selected':''}" data-action="media-stage" data-stage="${id}">${label}</button>`).join('')}</div>`;}
 function renderMedia(){
@@ -1116,6 +1147,7 @@ function act(button){const action=button.dataset.action;const exIndex=Number(but
   case 'save-media-custom':{const value=($('#personal-video-input')?.value||'').trim(),url=safeExerciseVideo(value),key=button.dataset.key;
  if(!url){toast('Please enter a working HTTPS video or exercise reference URL.',true);return;}
  state.videoLinks=state.videoLinks||{};state.videoLinks[key]=url;ui.activeVideo='';queueSave();render();toast('Video reference saved in this browser.');return;}
+  case 'report-video':{const key=button.dataset.key;if(state.videoLinks)delete state.videoLinks[key];ui.activeVideo='';queueSave();render();toast('Broken link removed. Choose a different source.');return;}
   case 'clear-media-custom':{if(state.videoLinks)delete state.videoLinks[button.dataset.key];ui.activeVideo='';queueSave();render();toast('Personal video removed.');return;}
   case 'save-video-link':{const value=($('#customVideoUrl')?.value||'').trim();if(!value){toast('Paste a video URL to save it.',true);return;}try{const u=new URL(value);if(!safeExerciseVideo(u.href))throw Error('Use a valid HTTPS reference URL');state.videoLinks=state.videoLinks||{};state.videoLinks[ui.guideId]=u.href;ui.activeVideo=ui.guideId;queueSave();render();toast('Technique video link saved.');}catch{toast('Enter a valid https:// video link.',true);}return;}
   case 'clear-video-link':{if(state.videoLinks)delete state.videoLinks[ui.guideId];queueSave();render();toast('Saved video link removed.');return;}
