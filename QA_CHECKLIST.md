@@ -20,7 +20,7 @@ Check on Android Chrome, iOS Safari and desktop Chrome/Edge, including 320px, 36
 - [ ] Clicking video search goes to YouTube (trusted educator terms)
 - [ ] Wikimedia Commons and Vimeo search links are available
 - [ ] No video suggests the removed Vimeo ID 962614569
-- [ ] No hard-coded unreviewed YouTube video auto-opens
+- [ ] 22 source-reviewed video URLs from checked publishers are mapped to the correct exercise, including 3 Commons HTML5 videos and an incline cable YouTube demo
 - [ ] EZ-bar curl has original Wikimedia source page and attribution
 - [ ] Save a YouTube link and open original; optional embedded player
 - [ ] Save a working Vimeo page and open original; optional player
